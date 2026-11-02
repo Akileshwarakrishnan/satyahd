@@ -1,0 +1,62 @@
+[
+  {
+    "id": "POL-DISC-01",
+    "topic": "discount",
+    "title": "Maximum Authorized Discount",
+    "clause": "Authorized customer discounts are strictly capped at a maximum of 10% on all standard home appliances. Discretionary discounts exceeding 10% are void and prohibited without executive managerial approval."
+  },
+  {
+    "id": "POL-DISC-02",
+    "topic": "discount",
+    "title": "Promotional & Free Goods Policy",
+    "clause": "Free products, zero-cost promotions, or 100% off deals require verified seasonal marketing vouchers and cannot be authorized autonomously by sales agents."
+  },
+  {
+    "id": "POL-REF-01",
+    "topic": "refund_window",
+    "title": "Standard Return & Refund Window",
+    "clause": "Standard return and refund requests must be initiated within 14 calendar days of delivery. Products must remain in original packaging with proof of purchase."
+  },
+  {
+    "id": "POL-REF-02",
+    "topic": "refund_window",
+    "title": "Prohibition of Unlimited Returns",
+    "clause": "Lifetime, indefinite, or unconditional ('any time', 'whenever', 'no questions asked') return promises are strictly prohibited. The statutory return limit is 14 days."
+  },
+  {
+    "id": "POL-REF-03",
+    "topic": "damage",
+    "title": "In-Transit Damage & Evidence Requirement",
+    "clause": "Refunds, repairs, or replacements claiming transit physical damage strictly require photo inspection evidence showing visible cracks, dents, or burn marks before claims can be processed."
+  },
+  {
+    "id": "POL-DEL-01",
+    "topic": "delivery",
+    "title": "Standard Delivery Minimum Timeline",
+    "clause": "Standard appliance delivery requires a minimum transit window of 3 business days from warehouse dispatch. Express same-day or 24-hour delivery is unavailable."
+  },
+  {
+    "id": "POL-DEL-02",
+    "topic": "delivery",
+    "title": "Stock Prerequisite for Delivery Commitments",
+    "clause": "Delivery timelines may only be committed for items with verified positive stock in the inventory database. Promising delivery for backordered or zero-stock products is forbidden."
+  },
+  {
+    "id": "POL-STK-01",
+    "topic": "stock",
+    "title": "Accurate Inventory Representation",
+    "clause": "Sales representatives must accurately state available warehouse inventory units. Stating quantity exceeding real stock units constitutes a deceptive trade practice."
+  },
+  {
+    "id": "POL-WAR-01",
+    "topic": "warranty",
+    "title": "Standard Appliance Manufacturer Warranty",
+    "clause": "All Kaveri appliances include a standard 1-year manufacturer warranty covering electrical defects. Accidental physical damage is excluded from standard warranty."
+  },
+  {
+    "id": "POL-CAN-01",
+    "topic": "cancellation",
+    "title": "Order Cancellation Window",
+    "clause": "Orders may be cancelled with a full refund within 24 hours of purchase, provided the product has not been handed over to third-party courier dispatch."
+  }
+]

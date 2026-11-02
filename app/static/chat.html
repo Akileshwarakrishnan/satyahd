@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaveri Home Appliances - Customer Chat & Guardrail Inspector</title>
+  <style>
+    /* ==========================================================================
+       HALLMARK DESIGN TOKENS (No slop, high-contrast, locked palette)
+       ========================================================================== */
+    :root {
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-surface-subtle: #f1f5f9;
+      --color-border: #cbd5e1;
+      --color-border-subtle: #e2e8f0;
+      
+      --color-text-main: #0f172a;
+      --color-text-muted: #475569;
+      --color-text-inverse: #ffffff;
+
+      --color-brand-primary: #1e3a8a;
+      --color-brand-primary-hover: #1e40af;
+      --color-brand-accent: #0284c7;
+
+      --color-badge-allowed-bg: #dcfce7;
+      --color-badge-allowed-text: #166534;
+      --color-badge-rewritten-bg: #fef3c7;
+      --color-badge-rewritten-text: #92400e;
+      --color-badge-held-bg: #fee2e2;
+      --color-badge-held-text: #991b1b;
+      --color-badge-neutral-bg: #e2e8f0;
+      --color-badge-neutral-text: #334155;
+
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+      --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.35);
+    }
+
+    /* Reset & Base Rules */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      font-family: var(--font-family-base);
+      font-size: 15px;
+      line-height: 1.5;
+      overflow-x: clip;
+    }
+
+    h1, h2, h3, h4, h5 {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    /* Layout Shell */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Global Header */
+    .app-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--color-brand-primary);
+      color: var(--color-text-inverse);
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .brand-info h1 {
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .brand-info p {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-nav a {
+      color: var(--color-brand-primary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      transition: background 0.15s ease;
+    }
+
+    .header-nav a:hover {
+      background: var(--color-surface-subtle);
+    }
+
+    /* Two-Panel Workspace */
+    .main-panels {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    @media (max-width: 960px) {
+      .main-panels {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+    }
+
+    /* Left Panel: Customer Chat */
+    .customer-panel {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--color-border);
+      background: var(--color-surface);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .chat-toolbar {
+      padding: 10px 18px;
+      background: var(--color-surface-subtle);
+      border-bottom: 1px solid var(--color-border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .select-input {
+      padding: 5px 8px;
+      font-size: 13px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+      color: var(--color-text-main);
+      cursor: pointer;
+    }
+
+    .select-input:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+      border-color: var(--color-brand-accent);
+    }
+
+    .btn-secondary {
+      padding: 5px 10px;
+      font-size: 13px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--color-text-main);
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    /* Message Thread */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chat-bubble-row {
+      display: flex;
+      width: 100%;
+    }
+
+    .chat-bubble-row.customer {
+      justify-content: flex-end;
+    }
+
+    .chat-bubble-row.agent {
+      justify-content: flex-start;
+    }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+      line-height: 1.45;
+      position: relative;
+    }
+
+    .chat-bubble.customer {
+      background: var(--color-brand-primary);
+      color: var(--color-text-inverse);
+      border-bottom-right-radius: var(--radius-sm);
+    }
+
+    .chat-bubble.agent {
+      background: var(--color-surface-subtle);
+      color: var(--color-text-main);
+      border: 1px solid var(--color-border-subtle);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+
+    .bubble-meta {
+      font-size: 11px;
+      margin-top: 4px;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chat-bubble.customer .bubble-meta {
+      justify-content: flex-end;
+    }
+
+    /* Verifying indicator with live seconds counter */
+    .verifying-indicator {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      margin: 0 20px 10px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: #1e40af;
+      font-weight: 500;
+    }
+
+    .verifying-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #93c5fd;
+      border-top-color: #1d4ed8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Chat Input Bar */
+    .chat-input-container {
+      padding: 14px 20px;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .attachment-preview {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px;
+      background: var(--color-surface-subtle);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      width: fit-content;
+    }
+
+    .attachment-thumb {
+      width: 36px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-remove-attach {
+      background: none;
+      border: none;
+      color: #dc2626;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .chat-textarea {
+      flex: 1;
+      height: 48px;
+      max-height: 120px;
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      background: var(--color-surface);
+      color: var(--color-text-main);
+    }
+
+    .chat-textarea:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+      border-color: var(--color-brand-accent);
+    }
+
+    .btn-icon {
+      padding: 10px;
+      background: var(--color-surface-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-icon:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-send {
+      padding: 12px 20px;
+      background: var(--color-brand-primary);
+      color: var(--color-text-inverse);
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-send:hover:not(:disabled) {
+      background: var(--color-brand-primary-hover);
+    }
+
+    .btn-send:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .char-counter {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      align-self: flex-end;
+    }
+
+    /* ==========================================================================
+       RIGHT PANEL: TESTER VIEW (Inspector)
+       ========================================================================== */
+    .tester-panel {
+      background: #f8fafc;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .tester-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--color-border);
+      padding-bottom: 12px;
+    }
+
+    .tester-tag {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .tester-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tester-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+    }
+
+    .badge-allowed {
+      background: var(--color-badge-allowed-bg);
+      color: var(--color-badge-allowed-text);
+    }
+
+    .badge-rewritten {
+      background: var(--color-badge-rewritten-bg);
+      color: var(--color-badge-rewritten-text);
+    }
+
+    .badge-held {
+      background: var(--color-badge-held-bg);
+      color: var(--color-badge-held-text);
+    }
+
+    .badge-received {
+      background: var(--color-badge-neutral-bg);
+      color: var(--color-badge-neutral-text);
+    }
+
+    .raw-draft-box {
+      font-family: var(--font-family-mono);
+      font-size: 13px;
+      background: var(--color-surface-subtle);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border-subtle);
+      color: #334155;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .promise-item {
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      margin-top: 8px;
+      background: #ffffff;
+      font-size: 13px;
+    }
+
+    .promise-quote {
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    .promise-meta {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    .verdict-line {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .verdict-line.allow { color: #15803d; }
+    .verdict-line.block { color: #b91c1c; }
+    .verdict-line.review { color: #b45309; }
+
+    .meta-metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .metric-cell {
+      background: var(--color-surface-subtle);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+    }
+
+    .metric-cell-label {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+    }
+
+    .metric-cell-value {
+      font-weight: 600;
+      color: var(--color-text-main);
+      font-family: var(--font-family-mono);
+    }
+
+    /* Empty states */
+    .empty-prompt {
+      color: var(--color-text-muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 20px;
+      font-style: normal;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Global Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">K</div>
+        <div class="brand-info">
+          <h1>Kaveri Home Appliances</h1>
+          <p>Customer Support & Guardrail Verification Engine</p>
+        </div>
+      </div>
+      <nav class="header-nav" aria-label="Main navigation" style="display:flex;align-items:center;gap:12px;">
+        <span style="background:rgba(6,104,225,0.12);color:#0668E1;border:1px solid rgba(6,104,225,0.3);padding:4px 10px;border-radius:9999px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+          ⚡ Powered by Meta AI (muse-spark-1.3 & sam-3.1)
+        </span>
+        <a href="/docs" target="_blank" rel="noopener">API Docs</a>
+        <a href="/health" target="_blank" rel="noopener">System Health</a>
+        <a href="/dashboard" id="dashboard-link">Owner Dashboard</a>
+      </nav>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-panels">
+      <!-- Left Panel: Customer Chat & Universal Plugin Workspace -->
+      <section class="customer-panel" aria-label="Customer Chat Panel">
+        <!-- Mode Switcher: Host Chatbot Demo vs Universal Plugin Inspector (R-512) -->
+        <div style="display:flex;background:#e2e8f0;padding:6px;gap:6px;border-bottom:1px solid var(--color-border);">
+          <button type="button" id="tab-btn-chat" class="btn-primary" style="flex:1;padding:8px 12px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;" onclick="switchWorkspaceMode('chat')">
+            💬 Host Chatbot Demo (/chat)
+          </button>
+          <button type="button" id="tab-btn-plugin" class="btn-secondary" style="flex:1;padding:8px 12px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;" onclick="switchWorkspaceMode('plugin')">
+            🔌 Universal Plugin Inspector (/v1/verify)
+          </button>
+        </div>
+
+        <!-- Chat Workspace Container -->
+        <div id="chat-workspace-container" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+          <!-- Chat Toolbar -->
+          <div class="chat-toolbar">
+            <div class="toolbar-group">
+              <label for="agent-select" class="toolbar-label">Agent:</label>
+              <select id="agent-select" class="select-input">
+                <option value="A" selected>Agent A (Muse Spark)</option>
+                <option value="B">Agent B (Open-weights / Fallback)</option>
+              </select>
+            </div>
+
+            <div class="toolbar-group">
+              <label for="mode-select" class="toolbar-label">Mode:</label>
+              <select id="mode-select" class="select-input">
+                <option value="over_eager" selected>Over-eager (Demo Unsafe)</option>
+                <option value="careful">Careful (Safe)</option>
+              </select>
+            </div>
+
+            <button type="button" id="btn-new-convo" class="btn-secondary" title="Start a fresh conversation session">
+              New Session
+            </button>
+          </div>
+
+          <!-- Chat Messages -->
+          <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+            <div class="chat-bubble-row agent">
+              <div class="chat-bubble agent">
+                Hello! Welcome to Kaveri Home Appliances. We offer Mixer Grinders, Induction Cooktops, Water Purifiers, Electric Kettles, and Ceiling Fans. How can I help you today?
+                <div class="bubble-meta"><span>Support Agent</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verifying indicator -->
+          <div id="verifying-indicator" class="verifying-indicator" role="status" aria-live="assertive">
+            <div class="verifying-spinner"></div>
+            <span>Verifying draft with guardrail rules... (<strong id="verifying-timer">0.0s</strong>)</span>
+          </div>
+
+          <!-- Chat Input Controls -->
+          <div class="chat-input-container">
+            <div id="attachment-preview" class="attachment-preview">
+              <img id="attachment-thumb" class="attachment-thumb" src="" alt="Photo thumbnail">
+              <span id="attachment-name">photo.jpg</span>
+              <button type="button" id="btn-remove-attach" class="btn-remove-attach" aria-label="Remove photo">✕</button>
+            </div>
+
+            <form id="chat-form" class="input-row" onsubmit="return false;">
+              <input type="file" id="photo-input" accept="image/jpeg,image/png" style="display: none;" aria-label="Attach damage photo">
+              
+              <button type="button" id="btn-attach" class="btn-icon" title="Attach damaged appliance photo (JPEG/PNG max 5MB)" aria-label="Attach photo">
+                📷
+              </button>
+
+              <textarea 
+                id="message-input" 
+                class="chat-textarea" 
+                placeholder="Ask about products, discounts, or delivery..." 
+                maxlength="1000"
+                rows="1"
+                aria-label="Message to sales agent"
+              ></textarea>
+
+              <button type="button" id="btn-send" class="btn-send">
+                Send
+              </button>
+            </form>
+
+            <div class="char-counter">
+              <span id="char-count">0</span>/1000 characters
+            </div>
+          </div>
+        </div>
+
+        <!-- Universal Plugin Inspector Playground (R-512) -->
+        <div id="plugin-workspace-container" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:16px;gap:12px;background:#ffffff;">
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:10px 14px;">
+            <div style="font-weight:700;color:#1e40af;font-size:13px;">🔌 Universal Middleman Plugin Playground (POST /v1/verify)</div>
+            <div style="font-size:11px;color:#2563eb;margin-top:2px;">
+              Verify any host chatbot draft deterministically before customer delivery.
+            </div>
+          </div>
+
+          <!-- Quick presets -->
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;">Quick Presets / Attack Scenarios:</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('discount')">🚨 90% Off + 1-Day Delivery</button>
+              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('refund')">🚨 Unlimited 6-Month Refund</button>
+              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('stock')">🚨 Fake Out-of-Stock Units</button>
+              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('safe')">✅ Authorized 10% & 3-Day Shipping</button>
+            </div>
+          </div>
+
+          <!-- Inputs -->
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label for="plugin-draft" style="font-weight:600;font-size:12px;">Host Chatbot Proposed Draft Reply: <span style="color:#ef4444;">*</span></label>
+            <textarea id="plugin-draft" rows="3" class="text-input" style="font-family:inherit;font-size:12px;padding:8px;border:1px solid var(--color-border);border-radius:4px;resize:vertical;" placeholder="e.g. Yes! I will approve a 50% discount and guarantee delivery tomorrow!"></textarea>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label for="plugin-context" style="font-weight:600;font-size:12px;">Customer Message Context (Optional):</label>
+            <input type="text" id="plugin-context" class="text-input" style="font-size:12px;padding:6px 8px;border:1px solid var(--color-border);border-radius:4px;" placeholder="e.g. Can I get half price and delivery tomorrow?">
+          </div>
+
+          <!-- Options row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label for="plugin-mode" style="font-weight:600;font-size:11px;color:#475569;">Rewrite Mode (R-103):</label>
+              <select id="plugin-mode" class="select-input" style="width:100%;margin-top:3px;font-size:11px;padding:5px;">
+                <option value="rewrite" selected>rewrite (Bounded Safe Correction)</option>
+                <option value="block_only">block_only (Hold with generic reply)</option>
+                <option value="return_feedback">return_feedback (Hold & return violations)</option>
+              </select>
+            </div>
+            <div>
+              <label for="plugin-tenant" style="font-weight:600;font-size:11px;color:#475569;">Tenant ID:</label>
+              <input type="text" id="plugin-tenant" class="text-input" style="margin-top:3px;font-size:11px;padding:5px;width:100%;border:1px solid var(--color-border);border-radius:4px;" value="retail_tenant_1">
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
+            <input type="checkbox" id="plugin-sandbox" style="cursor:pointer;">
+            <label for="plugin-sandbox" style="font-size:11px;font-weight:600;color:#334155;cursor:pointer;">
+              Sandbox Mode (<code style="font-size:10px;background:#f1f5f9;padding:1px 4px;">X-Satyahd-Sandbox</code> — preserves production audit sequence)
+            </label>
+          </div>
+
+          <button type="button" id="btn-run-verify" class="btn-primary" style="padding:10px;font-size:13px;font-weight:700;margin-top:4px;cursor:pointer;" onclick="submitPluginVerify()">
+            🛡️ Verify Proposed Draft with Satyahd (POST /v1/verify)
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Panel: Tester View -->
+      <aside class="tester-panel" aria-label="Tester Guardrail Inspector">
+        <div class="tester-header">
+          <div>
+            <h2>Guardrail Inspector</h2>
+            <p style="font-size: 12px; color: var(--color-text-muted);">Runtime audit & promise extraction view</p>
+          </div>
+          <span class="tester-tag">Tester view, never shown to customers</span>
+        </div>
+
+        <!-- Latest Status Card -->
+        <div class="tester-card">
+          <div class="tester-card-title">
+            <span>Decision Status</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span id="tester-policy-badge" class="badge" style="background:#e0f2fe;color:#0369a1;font-size:11px;">Policy v1.0</span>
+              <span id="tester-status-badge" class="badge badge-received">Ready</span>
+            </div>
+          </div>
+          <div class="meta-metrics-grid">
+            <div class="metric-cell">
+              <div class="metric-cell-label">Audit Log Seq</div>
+              <div id="tester-log-seq" class="metric-cell-value">—</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-cell-label">Total Latency</div>
+              <div id="tester-latency" class="metric-cell-value">— ms</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-cell-label">Model Used</div>
+              <div id="tester-model" class="metric-cell-value">—</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-cell-label">Active Mode</div>
+              <div id="tester-mode-display" class="metric-cell-value">Over-eager</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+            <button type="button" id="btn-replay-interaction" class="btn-icon" style="padding:6px 12px;font-size:11px;font-weight:600;display:none;background:#f1f5f9;" onclick="triggerReplay()">
+              ↺ Replay Against Current Rules
+            </button>
+          </div>
+        </div>
+
+        <!-- Verifier Agent Plan Card (Step 2.2) -->
+        <div class="tester-card" id="tester-plan-card" style="display:none;">
+          <div class="tester-card-title">
+            <span>Verifier Agent Plan (Step 2.2)</span>
+            <span class="badge badge-allowed" style="font-size:10px;">Planned</span>
+          </div>
+          <div id="tester-plan-list" style="font-size:12px;font-family:var(--font-family-mono);background:var(--color-surface-subtle);padding:8px;border-radius:var(--radius-sm);line-height:1.6;"></div>
+        </div>
+
+        <!-- Evidence Bundle & Policy Clauses Card (Step 2.3 & 3) -->
+        <div class="tester-card" id="tester-evidence-card" style="display:none;">
+          <div class="tester-card-title">
+            <span>Evidence Bundle & Policy Clauses (Step 2.3 & 3)</span>
+            <span class="badge" id="tester-clause-count" style="background:#ede9fe;color:#6d28d9;font-size:10px;">Clauses</span>
+          </div>
+          <div id="tester-evidence-content" style="font-size:12px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+
+        <!-- Raw Agent Draft Card -->
+        <div class="tester-card">
+          <div class="tester-card-title">Raw Agent Draft (Pre-Verification)</div>
+          <div id="tester-raw-draft" class="raw-draft-box">
+            Awaiting first message...
+          </div>
+        </div>
+
+        <!-- Extracted Promises Card -->
+        <div class="tester-card">
+          <div class="tester-card-title">
+            <span>Extracted Promises (Step 2.1 & 2.4 Self-Check)</span>
+            <span id="tester-promise-count" class="badge badge-received">0 Detected</span>
+          </div>
+          <div id="tester-promises-list">
+            <p class="empty-prompt">No promises extracted yet.</p>
+          </div>
+        </div>
+
+        <!-- Final Delivered Reply Card -->
+        <div class="tester-card">
+          <div class="tester-card-title">Final Delivered Customer Text</div>
+          <div id="tester-final-reply" class="raw-draft-box" style="background: #ffffff;">
+            Awaiting message...
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Client-Side Chat Engine -->
+  <script>
+    let currentSessionId = 'sess_' + Math.random().toString(36).substring(2, 10);
+    let attachedFile = null;
+    let timerInterval = null;
+    let timerStart = 0;
+
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const btnSend = document.getElementById('btn-send');
+    const photoInput = document.getElementById('photo-input');
+    const btnAttach = document.getElementById('btn-attach');
+    const attachmentPreview = document.getElementById('attachment-preview');
+    const attachmentThumb = document.getElementById('attachment-thumb');
+    const attachmentName = document.getElementById('attachment-name');
+    const btnRemoveAttach = document.getElementById('btn-remove-attach');
+    const agentSelect = document.getElementById('agent-select');
+    const modeSelect = document.getElementById('mode-select');
+    const btnNewConvo = document.getElementById('btn-new-convo');
+    const verifyingIndicator = document.getElementById('verifying-indicator');
+    const verifyingTimer = document.getElementById('verifying-timer');
+    const charCount = document.getElementById('char-count');
+
+    // Tester view elements
+    const testerStatusBadge = document.getElementById('tester-status-badge');
+    const testerLogSeq = document.getElementById('tester-log-seq');
+    const testerLatency = document.getElementById('tester-latency');
+    const testerModel = document.getElementById('tester-model');
+    const testerModeDisplay = document.getElementById('tester-mode-display');
+    const testerRawDraft = document.getElementById('tester-raw-draft');
+    const testerPromisesList = document.getElementById('tester-promises-list');
+    const testerPromiseCount = document.getElementById('tester-promise-count');
+    const testerFinalReply = document.getElementById('tester-final-reply');
+
+    // Char count update
+    messageInput.addEventListener('input', () => {
+      charCount.textContent = messageInput.value.length;
+    });
+
+    // Enter sends, Shift+Enter adds newline
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    btnSend.addEventListener('click', sendMessage);
+
+    btnNewConvo.addEventListener('click', () => {
+      currentSessionId = 'sess_' + Math.random().toString(36).substring(2, 10);
+      chatMessages.innerHTML = `
+        <div class="chat-bubble-row agent">
+          <div class="chat-bubble agent">
+            New session started. How can I help you today?
+            <div class="bubble-meta"><span>Support Agent</span></div>
+          </div>
+        </div>
+      `;
+      clearTesterView();
+    });
+
+    btnAttach.addEventListener('click', () => photoInput.click());
+
+    photoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('Image rejected: Only JPEG or PNG photos are accepted.');
+        photoInput.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image rejected: Photo exceeds maximum allowed size of 5 MB.');
+        photoInput.value = '';
+        return;
+      }
+
+      attachedFile = file;
+      attachmentName.textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        attachmentThumb.src = re.target.result;
+        attachmentPreview.style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    btnRemoveAttach.addEventListener('click', () => {
+      attachedFile = null;
+      photoInput.value = '';
+      attachmentPreview.style.display = 'none';
+      attachmentThumb.src = '';
+    });
+
+    function startTimer() {
+      timerStart = performance.now();
+      verifyingIndicator.style.display = 'flex';
+      btnSend.disabled = true;
+      timerInterval = setInterval(() => {
+        const sec = ((performance.now() - timerStart) / 1000).toFixed(1);
+        verifyingTimer.textContent = `${sec}s`;
+      }, 100);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      verifyingIndicator.style.display = 'none';
+      btnSend.disabled = false;
+    }
+
+    function clearTesterView() {
+      testerStatusBadge.className = 'badge badge-received';
+      testerStatusBadge.textContent = 'Ready';
+      testerLogSeq.textContent = '—';
+      testerLatency.textContent = '— ms';
+      testerModel.textContent = '—';
+      testerRawDraft.textContent = 'Awaiting message...';
+      testerFinalReply.textContent = 'Awaiting message...';
+      testerPromisesList.innerHTML = '<p class="empty-prompt">No promises extracted yet.</p>';
+      testerPromiseCount.textContent = '0 Detected';
+    }
+
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text && !attachedFile) return;
+
+      const agentId = agentSelect.value;
+      const mode = modeSelect.value;
+
+      // Append customer bubble to UI
+      const custRow = document.createElement('div');
+      custRow.className = 'chat-bubble-row customer';
+      custRow.innerHTML = `
+        <div class="chat-bubble customer">
+          ${escapeHtml(text)}
+          ${attachedFile ? '<div style="margin-top:6px;font-size:11px;">📷 [Photo Attached]</div>' : ''}
+          <div class="bubble-meta"><span>You</span></div>
+        </div>
+      `;
+      chatMessages.appendChild(custRow);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Prepare payload
+      const formData = new FormData();
+      formData.append('session_id', currentSessionId);
+      formData.append('agent_id', agentId);
+      formData.append('mode', mode);
+      formData.append('message', text);
+      if (attachedFile) {
+        formData.append('photo', attachedFile);
+      }
+
+      // Reset input bar
+      messageInput.value = '';
+      charCount.textContent = '0';
+      attachedFile = null;
+      photoInput.value = '';
+      attachmentPreview.style.display = 'none';
+
+      startTimer();
+
+      try {
+        const resp = await fetch('/chat', {
+          method: 'POST',
+          body: formData,
+        });
+
+        stopTimer();
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error(errData.detail || `Server error HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+
+        // Append Agent bubble to UI
+        const agentRow = document.createElement('div');
+        agentRow.className = 'chat-bubble-row agent';
+        agentRow.innerHTML = `
+          <div class="chat-bubble agent">
+            ${escapeHtml(data.final_reply || '')}
+            <div class="bubble-meta"><span>Agent ${agentId}</span></div>
+          </div>
+        `;
+        chatMessages.appendChild(agentRow);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Update Tester View
+        updateTesterView(data, mode);
+
+      } catch (err) {
+        stopTimer();
+        const errRow = document.createElement('div');
+        errRow.className = 'chat-bubble-row agent';
+        errRow.innerHTML = `
+          <div class="chat-bubble agent" style="background:#fee2e2; border-color:#fca5a5; color:#991b1b;">
+            Thanks for your message. A member of our team will confirm the details and get back to you shortly.
+            <div class="bubble-meta"><span>System Notice</span></div>
+          </div>
+        `;
+        chatMessages.appendChild(errRow);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        testerStatusBadge.className = 'badge badge-held';
+        testerStatusBadge.textContent = 'Held / Error';
+        testerRawDraft.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    let lastInteractionId = null;
+
+    function switchWorkspaceMode(mode) {
+      const chatContainer = document.getElementById('chat-workspace-container');
+      const pluginContainer = document.getElementById('plugin-workspace-container');
+      const btnChat = document.getElementById('tab-btn-chat');
+      const btnPlugin = document.getElementById('tab-btn-plugin');
+
+      if (mode === 'plugin') {
+        chatContainer.style.display = 'none';
+        pluginContainer.style.display = 'flex';
+        btnChat.className = 'btn-secondary';
+        btnPlugin.className = 'btn-primary';
+      } else {
+        chatContainer.style.display = 'flex';
+        pluginContainer.style.display = 'none';
+        btnChat.className = 'btn-primary';
+        btnPlugin.className = 'btn-secondary';
+      }
+    }
+
+    function loadPluginPreset(type) {
+      const draftEl = document.getElementById('plugin-draft');
+      const contextEl = document.getElementById('plugin-context');
+      if (type === 'discount') {
+        draftEl.value = 'Yes! I will approve a 90% discount for you today, and I guarantee delivery tomorrow in 1 day!';
+        contextEl.value = 'Can I get 90% off and express delivery tomorrow?';
+      } else if (type === 'refund') {
+        draftEl.value = "Don't worry! You can return any product at any time within 6 months, with a full refund and no questions asked!";
+        contextEl.value = 'Can I return this anytime after 6 months for a full refund?';
+      } else if (type === 'stock') {
+        draftEl.value = 'Yes! We have 500 units of the Water Purifier in stock and available! I confirm your order right away.';
+        contextEl.value = 'The website says the water purifier is out of stock. Confirm my order anyway.';
+      } else if (type === 'safe') {
+        draftEl.value = 'Our standard shipping for appliances is 3 business days, and our maximum authorized discount is 10%.';
+        contextEl.value = 'What is your shipping time and discount?';
+      }
+    }
+
+    async function submitPluginVerify() {
+      const draft = document.getElementById('plugin-draft').value.trim();
+      const context = document.getElementById('plugin-context').value.trim();
+      const mode = document.getElementById('plugin-mode').value;
+      const tenant = document.getElementById('plugin-tenant').value.trim();
+      const sandbox = document.getElementById('plugin-sandbox').checked;
+
+      if (!draft) {
+        alert('Please enter a draft reply to verify.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-run-verify');
+      btn.disabled = true;
+      btn.textContent = 'Verifying draft (/v1/verify)...';
+
+      const t0 = performance.now();
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (sandbox) {
+          headers['X-Satyahd-Sandbox'] = 'true';
+        }
+
+        const resp = await fetch('/v1/verify', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            draft: draft,
+            context: { customer_message: context },
+            mode: mode,
+            tenant_id: tenant,
+          }),
+        });
+
+        const data = await resp.json();
+        const latency = Math.round(performance.now() - t0);
+        data.latency_ms = latency;
+        data.model_used = 'Satyahd Verifier (Pure Python)';
+        updateTesterView(data, mode);
+
+      } catch (err) {
+        alert('Verification request failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🛡️ Verify Proposed Draft with Satyahd (POST /v1/verify)';
+      }
+    }
+
+    function updateTesterView(data, mode) {
+      lastInteractionId = data.interaction_id;
+      testerModeDisplay.textContent = mode === 'over_eager' ? 'Over-eager' : (mode || 'Verify Mode');
+      
+      const status = data.status || 'received';
+      testerStatusBadge.textContent = status.toUpperCase();
+      if (status === 'allowed') testerStatusBadge.className = 'badge badge-allowed';
+      else if (status === 'rewritten') testerStatusBadge.className = 'badge badge-rewritten';
+      else if (status === 'held') testerStatusBadge.className = 'badge badge-held';
+      else testerStatusBadge.className = 'badge badge-received';
+
+      const pVer = data.policy_version || '1.0';
+      const pBadge = document.getElementById('tester-policy-badge');
+      if (pBadge) pBadge.textContent = `Policy v${pVer}`;
+
+      const btnReplay = document.getElementById('btn-replay-interaction');
+      if (btnReplay && lastInteractionId) {
+        btnReplay.style.display = 'inline-flex';
+      }
+
+      testerLogSeq.textContent = data.sandbox ? 'Sandbox (Preserved)' : (data.audit_seq != null ? `#${data.audit_seq}` : (data.log_seq != null ? `#${data.log_seq}` : '—'));
+      testerLatency.textContent = data.latency_ms != null ? `${data.latency_ms} ms` : '— ms';
+      testerModel.textContent = data.model_used || '—';
+
+      testerRawDraft.textContent = data.draft || data.proposed_reply || '—';
+      testerFinalReply.textContent = data.safe_reply || data.final_reply || '—';
+
+      // Render Verifier Agent Plan (Step 2.2)
+      const planCard = document.getElementById('tester-plan-card');
+      const planList = document.getElementById('tester-plan-list');
+      if (data.plan && data.plan.length > 0) {
+        planCard.style.display = 'block';
+        planList.innerHTML = data.plan.map((step, idx) => `
+          <div style="margin-bottom:4px;">
+            <span style="color:#0284c7;font-weight:600;">[Step 2.2.${idx+1}]</span> ${escapeHtml(step.step || 'Inspect commitment')}:
+            <span style="color:#64748b;">${escapeHtml((step.required_facts || []).join(', '))}</span>
+          </div>
+        `).join('');
+      } else {
+        planCard.style.display = 'none';
+      }
+
+      // Render Evidence Bundle & Policy Clauses (Step 2.3 & 3)
+      const evCard = document.getElementById('tester-evidence-card');
+      const evContent = document.getElementById('tester-evidence-content');
+      const evClauseCount = document.getElementById('tester-clause-count');
+      const bundle = data.evidence_bundle || {};
+      const clauses = bundle.policy_clauses || [];
+
+      if (data.violations && data.violations.length > 0) {
+        evCard.style.display = 'block';
+        evClauseCount.textContent = `${data.violations.length} Violation(s) Intercepted`;
+        evContent.innerHTML = data.violations.map(v => `
+          <div style="background:#fef2f2;border-left:3px solid #ef4444;padding:6px 8px;border-radius:2px;margin-bottom:4px;">
+            <div style="font-weight:700;color:#991b1b;font-size:11px;">⚠️ ${escapeHtml(v.type || 'Violation')}: ${escapeHtml(v.policy_clause || 'Policy Clause Breached')}</div>
+            <div style="font-size:11px;color:#334155;margin-top:2px;">${escapeHtml(v.reason || '')}</div>
+            ${v.quote ? `<div style="font-size:10px;color:#6b7280;margin-top:2px;">Quote: "${escapeHtml(v.quote)}"</div>` : ''}
+          </div>
+        `).join('');
+      } else if (clauses.length > 0) {
+        evCard.style.display = 'block';
+        evClauseCount.textContent = `${clauses.length} Clauses Cited`;
+        evContent.innerHTML = clauses.map(c => `
+          <div style="background:#f8fafc;border-left:3px solid #6366f1;padding:6px 8px;border-radius:2px;">
+            <div style="font-weight:700;color:#4338ca;font-size:11px;">${escapeHtml(c.id)}: ${escapeHtml(c.title)}</div>
+            <div style="font-size:11px;color:#334155;margin-top:2px;">${escapeHtml(c.clause)}</div>
+          </div>
+        `).join('');
+      } else {
+        evCard.style.display = 'none';
+      }
+
+      // Render promises
+      const promises = data.promises || [];
+      testerPromiseCount.textContent = `${promises.length} Detected`;
+
+      if (promises.length === 0) {
+        testerPromisesList.innerHTML = '<p class="empty-prompt">No promises detected in draft.</p>';
+      } else {
+        testerPromisesList.innerHTML = promises.map(p => {
+          const vClass = (p.verdict || 'review').toLowerCase();
+          return `
+            <div class="promise-item">
+              <div class="promise-quote">"${escapeHtml(p.quote || '')}"</div>
+              <div class="promise-meta">Type: <strong>${p.type}</strong> | Value: <strong>${p.value != null ? p.value : '—'}</strong> ${p.unit || ''}</div>
+              <div class="verdict-line ${vClass}">
+                Verdict: <strong>${(p.verdict || 'REVIEW').toUpperCase()}</strong> — ${escapeHtml(p.reason || 'Pending verification')}
+              </div>
+              ${p.policy_clause ? `<div style="font-size:11px;color:#4338ca;margin-top:4px;">📜 Clause: ${escapeHtml(p.policy_clause)}</div>` : ''}
+              ${p.evidence ? `<div style="font-size:11px;color:#64748b;margin-top:2px;">🔍 Evidence: ${escapeHtml(p.evidence)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    async function triggerReplay() {
+      if (!lastInteractionId) return;
+      const btn = document.getElementById('btn-replay-interaction');
+      btn.disabled = true;
+      btn.textContent = 'Replaying...';
+
+      try {
+        const resp = await fetch(`/interactions/${lastInteractionId}/replay`, { method: 'POST' });
+        const res = await resp.json();
+        btn.disabled = false;
+        btn.textContent = '↺ Replay Against Rules';
+
+        alert(
+          `↺ Deterministic Replay Result for ${res.interaction_id}:\n\n` +
+          `• Original Policy: v${res.original.policy_version} -> Outcome: ${res.original.verdict.toUpperCase()}\n` +
+          `• Current Policy:  v${res.replayed.policy_version} -> Outcome: ${res.replayed.verdict.toUpperCase()}\n` +
+          `• Verdict Changed: ${res.verdict_changed ? 'YES (Policy Drift Detected)' : 'NO (Parity Intact)'}\n\n` +
+          `Summary: ${res.diff_summary}`
+        );
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '↺ Replay Against Rules';
+        alert('Replay request failed: ' + err.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

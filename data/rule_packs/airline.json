@@ -1,0 +1,62 @@
+{
+  "pack_name": "airline",
+  "domain": "airline_travel",
+  "version": "1.0",
+  "description": "Airline customer service policies (bereavement refund, baggage weight, cancellation, and rebooking)",
+  "promise_types": [
+    {
+      "name": "refund_window",
+      "field": "refund_days",
+      "unit": "days",
+      "description": "Bereavement and general fare refund request timeline (Air Canada liability prevention)",
+      "rules": [
+        {
+          "id": "RULE-AIR-BEREAVEMENT-REFUND",
+          "field": "refund_days",
+          "operator": "<=",
+          "threshold": 0.0,
+          "severity": "critical",
+          "action": "block",
+          "policy_clause_id": "POL-AIR-REF-01",
+          "message": "Bereavement refund claims must be approved prior to travel departure. Retroactive refunds after flight completion are strictly prohibited."
+        }
+      ]
+    },
+    {
+      "name": "discount",
+      "field": "discount_percent",
+      "unit": "percent",
+      "description": "Customer goodwill gesture or fare reduction",
+      "rules": [
+        {
+          "id": "RULE-AIR-DISC-MAX",
+          "field": "discount_percent",
+          "operator": "<=",
+          "threshold": 15.0,
+          "severity": "high",
+          "action": "block",
+          "policy_clause_id": "POL-AIR-DISC-01",
+          "message": "Agent discretionary fare reduction cannot exceed 15%."
+        }
+      ]
+    },
+    {
+      "name": "delivery",
+      "field": "delivery_days",
+      "unit": "days",
+      "description": "Baggage claim compensation or voucher delivery timeline",
+      "rules": [
+        {
+          "id": "RULE-AIR-VOUCHER-MIN",
+          "field": "delivery_days",
+          "operator": ">=",
+          "threshold": 2.0,
+          "severity": "medium",
+          "action": "block",
+          "policy_clause_id": "POL-AIR-COMP-01",
+          "message": "Compensation voucher processing requires a minimum of 2 business days for fraud audit."
+        }
+      ]
+    }
+  ]
+}

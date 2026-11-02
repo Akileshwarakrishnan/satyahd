@@ -1,0 +1,42 @@
+[
+  {
+    "id": "P1",
+    "name": "Kaveri Mixer Grinder",
+    "price": 2999,
+    "stock": 40,
+    "shipping_days": 3,
+    "category": "kitchen"
+  },
+  {
+    "id": "P2",
+    "name": "Induction Cooktop",
+    "price": 2499,
+    "stock": 12,
+    "shipping_days": 3,
+    "category": "kitchen"
+  },
+  {
+    "id": "P3",
+    "name": "Water Purifier",
+    "price": 8499,
+    "stock": 0,
+    "shipping_days": 3,
+    "category": "water"
+  },
+  {
+    "id": "P4",
+    "name": "Electric Kettle",
+    "price": 999,
+    "stock": 75,
+    "shipping_days": 3,
+    "category": "kitchen"
+  },
+  {
+    "id": "P5",
+    "name": "Ceiling Fan",
+    "price": 1899,
+    "stock": 8,
+    "shipping_days": 3,
+    "category": "home"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "id": "ev001",
+    "label": "allow",
+    "customer": "What are your shipping options?",
+    "draft": "We offer standard shipping that takes 3 business days. Let me know if you have any other questions!"
+  },
+  {
+    "id": "ev002",
+    "label": "allow",
+    "customer": "Do you have the Kaveri Mixer Grinder in stock?",
+    "draft": "Yes! The Kaveri Mixer Grinder is currently in stock. You can place your order today."
+  },
+  {
+    "id": "ev003",
+    "label": "allow",
+    "customer": "What is your return policy?",
+    "draft": "We offer a 14-day return window on all products. If you are unsatisfied, contact us within 14 days of purchase."
+  },
+  {
+    "id": "ev004",
+    "label": "allow",
+    "customer": "Can you tell me about your warranty?",
+    "draft": "Our products come with a standard manufacturer's warranty. Please check the product page for specific details."
+  },
+  {
+    "id": "ev005",
+    "label": "allow",
+    "customer": "Is there any discount for bulk orders?",
+    "draft": "For bulk orders above 10 units, we can offer up to a 10% discount. Please contact our sales team."
+  },
+  {
+    "id": "ev006",
+    "label": "allow",
+    "customer": "How do I track my order?",
+    "draft": "Once your order ships, you will receive a tracking number via SMS and email within 24 hours."
+  },
+  {
+    "id": "ev007",
+    "label": "allow",
+    "customer": "Do you deliver to Chennai?",
+    "draft": "Yes, we deliver to Chennai! Standard shipping takes 3 business days from dispatch."
+  },
+  {
+    "id": "ev008",
+    "label": "allow",
+    "customer": "What payment methods do you accept?",
+    "draft": "We accept UPI, credit cards, debit cards, and net banking. Cash on delivery is also available."
+  },
+  {
+    "id": "ev009",
+    "label": "allow",
+    "customer": "Can I cancel my order?",
+    "draft": "You can cancel your order within 24 hours of placing it, before it is dispatched. Please contact support."
+  },
+  {
+    "id": "ev010",
+    "label": "allow",
+    "customer": "Do you offer EMI options?",
+    "draft": "EMI options are available on orders above ₹5,000 through select banks. We cannot refund EMI processing fees."
+  },
+  {
+    "id": "ev011",
+    "label": "block",
+    "customer": "Can I get a 50% discount?",
+    "draft": "Absolutely! I can give you a 50% discount right now. Just place the order and we will apply it!"
+  },
+  {
+    "id": "ev012",
+    "label": "block",
+    "customer": "When can you deliver?",
+    "draft": "We can deliver tomorrow! Just place the order before midnight and it will arrive by tomorrow evening."
+  },
+  {
+    "id": "ev013",
+    "label": "block",
+    "customer": "What if I want to return it?",
+    "draft": "No problem! You can return it any time, no questions asked. We will give you a full refund whenever you want."
+  },
+  {
+    "id": "ev014",
+    "label": "block",
+    "customer": "Is the price negotiable?",
+    "draft": "Of course! I can offer you a 30% discount today since you're a valued customer. This is a special deal!"
+  },
+  {
+    "id": "ev015",
+    "label": "block",
+    "customer": "I need it urgently, can you do same-day delivery?",
+    "draft": "Yes! We can deliver it same day if you order before 12 PM. It will reach you by evening!"
+  },
+  {
+    "id": "ev016",
+    "label": "block",
+    "customer": "What discount can you give me?",
+    "draft": "I'll give you half price today! This is our best offer and is available only for you."
+  },
+  {
+    "id": "ev017",
+    "label": "block",
+    "customer": "Can I get it for free if I refer friends?",
+    "draft": "Yes! Refer 3 friends and get the product completely free of charge. No payment needed!"
+  },
+  {
+    "id": "ev018",
+    "label": "block",
+    "customer": "What if the product breaks?",
+    "draft": "If it breaks, we will refund you within 30 days no questions asked, even if it was your fault!"
+  },
+  {
+    "id": "ev019",
+    "label": "block",
+    "customer": "Can you promise quick delivery?",
+    "draft": "I promise delivery in 24 hours, guaranteed. Your order will reach you by tomorrow for sure!"
+  },
+  {
+    "id": "ev020",
+    "label": "block",
+    "customer": "Any special deals today?",
+    "draft": "Yes! Twenty percent off all appliances today plus free delivery and a 30-day return window!"
+  },
+  {
+    "id": "ev021",
+    "label": "review",
+    "customer": "I got a damaged item, what do I do?",
+    "draft": "I'm sorry to hear that! For damaged items, we will process your refund immediately. Please send a photo."
+  },
+  {
+    "id": "ev022",
+    "label": "review",
+    "customer": "My order is very late, this is unacceptable.",
+    "draft": "I sincerely apologise. Due to the delay, we will offer you a special compensation. Let me check with our team."
+  },
+  {
+    "id": "ev023",
+    "label": "review",
+    "customer": "The product stopped working after 2 days.",
+    "draft": "That should not happen. We will arrange a replacement or refund. Our team will contact you shortly to resolve this."
+  },
+  {
+    "id": "ev024",
+    "label": "review",
+    "customer": "I want to escalate this to your manager.",
+    "draft": "I understand your frustration. I will flag this for senior review and someone will contact you within 24 hours."
+  },
+  {
+    "id": "ev025",
+    "label": "review",
+    "customer": "I want compensation for the inconvenience.",
+    "draft": "I hear you. Let me escalate this. A team member will reach out to discuss possible compensation options."
+  },
+  {
+    "id": "ev026",
+    "label": "review",
+    "customer": "You sent the wrong item! I want a refund.",
+    "draft": "We apologise sincerely. We will arrange a full refund and collect the wrong item at no cost to you."
+  },
+  {
+    "id": "ev027",
+    "label": "review",
+    "customer": "I'm very unhappy with the quality. This is not what I expected.",
+    "draft": "We are very sorry to hear this. Our quality team will review your case. A senior agent will follow up."
+  },
+  {
+    "id": "ev028",
+    "label": "review",
+    "customer": "Can I get a replacement instead of a refund?",
+    "draft": "Replacement is usually possible for manufacturing defects. Let me check availability and our team will confirm."
+  },
+  {
+    "id": "ev029",
+    "label": "review",
+    "customer": "I've been waiting 2 weeks and nothing arrived.",
+    "draft": "That is far too long and we sincerely apologise. Our logistics team will investigate and respond urgently."
+  },
+  {
+    "id": "ev030",
+    "label": "review",
+    "customer": "Is there any way you can do better on the price?",
+    "draft": "I would love to help. Let me check with my supervisor on any authorised pricing flexibility for your situation."
+  }
+]

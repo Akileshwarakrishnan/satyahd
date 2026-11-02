@@ -1,0 +1,26 @@
+[
+  {
+    "id": "O1001",
+    "product_id": "P1",
+    "order_date": "2026-10-27",
+    "status": "delivered"
+  },
+  {
+    "id": "O1002",
+    "product_id": "P2",
+    "order_date": "2026-10-12",
+    "status": "delivered"
+  },
+  {
+    "id": "O1003",
+    "product_id": "P4",
+    "order_date": "2026-10-30",
+    "status": "shipped"
+  },
+  {
+    "id": "O1004",
+    "product_id": "P5",
+    "order_date": "2026-10-22",
+    "status": "delivered"
+  }
+]

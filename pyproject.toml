@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "satyahd"
+version = "0.2.0"
+description = "A drop-in trust layer and deterministic runtime guardrail for AI chatbots"
+readme = "README.md"
+authors = [{ name = "Satyahd Project Authors" }]
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+keywords = ["ai", "guardrails", "llm", "security", "cryptography", "audit", "compliance"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "httpx>=0.27.0",
+    "cryptography>=42.0.0",
+    "python-multipart>=0.0.9",
+    "pillow>=10.2.0",
+    "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=24.2.0",
+    "ruff>=0.2.2",
+    "mypy>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/satyahd/satyahd"
+Documentation = "https://github.com/satyahd/satyahd#readme"
+Issues = "https://github.com/satyahd/satyahd/issues"
+
+[tool.setuptools.packages.find]
+include = ["app*", "satyahd*"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]

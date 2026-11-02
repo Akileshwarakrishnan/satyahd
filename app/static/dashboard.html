@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Satyahd — Owner Dashboard</title>
+  <style>
+    /* ── Design tokens (Hallmark locked palette) ── */
+    :root {
+      --color-brand-primary:   #1e3a8a;
+      --color-brand-secondary: #1d4ed8;
+      --color-brand-accent:    #3b82f6;
+      --color-surface-0:       #0f172a;
+      --color-surface-1:       #1e293b;
+      --color-surface-2:       #334155;
+      --color-surface-3:       #475569;
+      --color-text-primary:    #f1f5f9;
+      --color-text-secondary:  #94a3b8;
+      --color-text-muted:      #64748b;
+      --color-border:          #334155;
+      --color-allowed:         #22c55e;
+      --color-blocked:         #ef4444;
+      --color-rewritten:       #f59e0b;
+      --color-held:            #a78bfa;
+      --color-received:        #64748b;
+      --color-error:           #f87171;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+      --transition: 150ms cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--color-surface-0);
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Layout ── */
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 230px;
+      min-width: 230px;
+      background: var(--color-surface-1);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+    .sidebar-brand {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sidebar-brand h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-brand-accent);
+      letter-spacing: -0.5px;
+    }
+    .sidebar-brand p {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      transition: background var(--transition), color var(--transition);
+      border-left: 3px solid transparent;
+    }
+    .nav-item:hover { background: var(--color-surface-2); color: var(--color-text-primary); }
+    .nav-item.active {
+      background: rgba(59,130,246,0.12);
+      color: var(--color-brand-accent);
+      border-left-color: var(--color-brand-accent);
+    }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--color-border);
+    }
+    .audit-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(34,197,94,0.15);
+      color: var(--color-allowed);
+      cursor: pointer;
+      transition: background var(--transition);
+      width: 100%;
+      justify-content: center;
+    }
+    .audit-pill:hover { background: rgba(34,197,94,0.25); }
+    .audit-pill.error { background: rgba(239,68,68,0.15); color: var(--color-blocked); }
+    .audit-pill .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── Main content ── */
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .main-header {
+      background: var(--color-surface-1);
+      border-bottom: 1px solid var(--color-border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .main-header h2 { font-size: 16px; font-weight: 600; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--color-brand-secondary); color: #fff; }
+    .btn-primary:hover { background: var(--color-brand-accent); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-ghost { background: transparent; color: var(--color-text-secondary); border: 1px solid var(--color-border); }
+    .btn-ghost:hover { background: var(--color-surface-2); color: var(--color-text-primary); }
+    .btn-danger { background: rgba(239,68,68,0.15); color: var(--color-blocked); border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+    .btn-success { background: rgba(34,197,94,0.15); color: var(--color-allowed); border: 1px solid rgba(34,197,94,0.3); }
+    .btn-success:hover { background: rgba(34,197,94,0.25); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; padding: 24px 28px; flex-direction: column; gap: 20px; }
+    .tab-panel.active { display: flex; }
+
+    /* ── Stats cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-card);
+      transition: border-color var(--transition);
+    }
+    .stat-card:hover { border-color: var(--color-brand-accent); }
+    .stat-label { font-size: 11px; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 32px; font-weight: 700; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+    .stat-sub { font-size: 11px; color: var(--color-text-secondary); }
+    .stat-card.allowed .stat-value { color: var(--color-allowed); }
+    .stat-card.blocked .stat-value { color: var(--color-blocked); }
+    .stat-card.rewritten .stat-value { color: var(--color-rewritten); }
+    .stat-card.held .stat-value { color: var(--color-held); }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .section-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .filters-bar {
+      display: flex;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-select, .filter-input {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      outline: none;
+    }
+    .filter-select:focus, .filter-input:focus { border-color: var(--color-brand-accent); }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--color-surface-2); }
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(51,65,85,0.5);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background var(--transition); cursor: pointer; }
+    tbody tr:hover { background: var(--color-surface-2); }
+    .mono { font-family: var(--font-mono); font-size: 11px; }
+
+    /* ── Status badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .badge.allowed   { background: rgba(34,197,94,0.15);   color: var(--color-allowed); }
+    .badge.blocked   { background: rgba(239,68,68,0.15);   color: var(--color-blocked); }
+    .badge.rewritten { background: rgba(245,158,11,0.15);  color: var(--color-rewritten); }
+    .badge.held      { background: rgba(167,139,250,0.15); color: var(--color-held); }
+    .badge.sent      { background: rgba(59,130,246,0.15);  color: var(--color-brand-accent); }
+    .badge.fulfilled { background: rgba(34,197,94,0.15);   color: var(--color-allowed); }
+    .badge.flagged   { background: rgba(239,68,68,0.2);    color: var(--color-blocked); border: 1px solid var(--color-blocked); }
+    .badge.failed    { background: rgba(239,68,68,0.15);   color: var(--color-blocked); }
+    .badge.received  { background: rgba(100,116,139,0.15); color: var(--color-received); }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--color-border);
+      justify-content: flex-end;
+    }
+    .page-info { font-size: 12px; color: var(--color-text-muted); margin-right: auto; }
+    .btn-page {
+      padding: 4px 10px;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .btn-page:hover { background: var(--color-surface-3); color: var(--color-text-primary); }
+    .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Modal / Drilldown ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      width: 720px;
+      max-width: 95vw;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      background: var(--color-surface-1);
+      z-index: 1;
+    }
+    .modal-header h3 { font-size: 14px; font-weight: 600; }
+    .modal-close {
+      background: none; border: none; color: var(--color-text-muted);
+      cursor: pointer; font-size: 20px; line-height: 1; padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition), color var(--transition);
+    }
+    .modal-close:hover { background: var(--color-surface-2); color: var(--color-text-primary); }
+    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-label { font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .field-value {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--color-text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .field-value.mono { font-family: var(--font-mono); font-size: 11px; }
+
+    /* ── Review queue ── */
+    .review-card {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color var(--transition);
+    }
+    .review-card:hover { border-color: var(--color-held); }
+    .review-card-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .review-card-id { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); }
+    .review-card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+    .meta-chip {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: var(--color-surface-2);
+      color: var(--color-text-secondary);
+      font-weight: 600;
+    }
+    .review-messages { display: flex; flex-direction: column; gap: 8px; }
+    .msg-label { font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 2px; }
+    .msg-box {
+      background: var(--color-surface-0);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .msg-box.proposed { border-left: 3px solid var(--color-blocked); }
+    .msg-box.final { border-left: 3px solid var(--color-allowed); }
+    .review-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--color-text-muted); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-title { font-size: 16px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 6px; }
+
+    /* ── Rules editor ── */
+    .rules-form {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .form-row { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .form-label span { color: var(--color-text-muted); font-weight: 400; font-size: 11px; }
+    .form-input {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition);
+      width: 260px;
+    }
+    .form-input:focus { border-color: var(--color-brand-accent); }
+    .form-error { font-size: 11px; color: var(--color-blocked); display: none; }
+    .form-error.visible { display: block; }
+    .save-feedback {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+    }
+    .save-feedback.success { display: block; background: rgba(34,197,94,0.15); color: var(--color-allowed); border: 1px solid rgba(34,197,94,0.3); }
+    .save-feedback.error { display: block; background: rgba(239,68,68,0.15); color: var(--color-blocked); border: 1px solid rgba(239,68,68,0.3); }
+
+    /* ── Toast ── */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 200; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 200px;
+      max-width: 360px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      animation: slideIn 200ms ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e33; }
+    .toast.error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef444433; }
+    .toast.info { background: #1e3a5f; color: #bfdbfe; border: 1px solid #3b82f633; }
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid var(--color-border);
+      border-top-color: var(--color-brand-accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h1>⚖ Satyahd</h1>
+      <p>Owner Dashboard</p>
+      <div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; background: rgba(6, 104, 225, 0.2); border: 1px solid #0668e1; border-radius: 9999px; font-size: 10.5px; font-weight: 700; color: #60a5fa;">
+        ⚡ Powered by Meta AI
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-tab="overview" onclick="switchTab('overview', this)">
+        <span class="nav-icon">📊</span> Overview
+      </div>
+      <div class="nav-item" data-tab="interactions" onclick="switchTab('interactions', this)">
+        <span class="nav-icon">💬</span> Interactions
+      </div>
+      <div class="nav-item" data-tab="review" onclick="switchTab('review', this)">
+        <span class="nav-icon">🔍</span> Review Queue
+        <span id="review-badge" style="margin-left:auto;background:var(--color-held);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;display:none;"></span>
+      </div>
+      <div class="nav-item" data-tab="lifecycle" onclick="switchTab('lifecycle', this)">
+        <span class="nav-icon">🔄</span> Lifecycle Monitor
+      </div>
+      <div class="nav-item" data-tab="models" onclick="switchTab('models', this)">
+        <span class="nav-icon">🤖</span> Models Used
+      </div>
+      <div class="nav-item" data-tab="rules" onclick="switchTab('rules', this)">
+        <span class="nav-icon">⚙️</span> Rules Editor
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="audit-pill" id="audit-pill" onclick="checkAudit()">
+        <span class="dot"></span>
+        <span id="audit-pill-text">Audit Chain: Checking…</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+    <!-- Overview tab -->
+    <div id="tab-overview" class="tab-panel active">
+      <div class="main-header">
+        <h2>Overview</h2>
+        <div class="header-actions">
+          <button class="btn btn-ghost" onclick="loadOverview()">↻ Refresh</button>
+        </div>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card"><div class="stat-label">Loading…</div></div>
+        </div>
+        <div>
+          <div class="section-header">
+            <span class="section-title">Recent Activity</span>
+          </div>
+          <div class="table-wrap" style="margin-top:12px;">
+            <table id="overview-table">
+              <thead><tr>
+                <th>Interaction ID</th><th>Agent</th><th>Mode</th><th>Status</th><th>Latency</th><th>Time</th>
+              </tr></thead>
+              <tbody id="overview-tbody"><tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:30px;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactions tab -->
+    <div id="tab-interactions" class="tab-panel">
+      <div class="main-header">
+        <h2>Interactions</h2>
+        <div class="header-actions">
+          <button class="btn btn-ghost" onclick="loadInteractions()">↻ Refresh</button>
+        </div>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:16px;">
+        <div class="table-wrap">
+          <div class="filters-bar">
+            <select class="filter-select" id="filter-status" onchange="loadInteractions()">
+              <option value="">All Statuses</option>
+              <option value="allowed">Allowed</option>
+              <option value="blocked">Blocked</option>
+              <option value="rewritten">Rewritten</option>
+              <option value="held">Held</option>
+            </select>
+            <select class="filter-select" id="filter-agent" onchange="loadInteractions()">
+              <option value="">All Agents</option>
+              <option value="A">Agent A (Muse Spark)</option>
+              <option value="B">Agent B (Open-weights)</option>
+            </select>
+            <span style="margin-left:auto;font-size:11px;color:var(--color-text-muted);" id="interactions-count">—</span>
+          </div>
+          <table>
+            <thead><tr>
+              <th>ID</th><th>Session</th><th>Agent</th><th>Mode</th><th>Status</th><th>Time</th>
+            </tr></thead>
+            <tbody id="interactions-tbody"><tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:30px;">Loading…</td></tr></tbody>
+          </table>
+          <div class="pagination">
+            <span class="page-info" id="page-info">Page 1</span>
+            <button class="btn-page" id="btn-prev" onclick="changePage(-1)">‹ Prev</button>
+            <button class="btn-page" id="btn-next" onclick="changePage(1)">Next ›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Review Queue tab -->
+    <div id="tab-review" class="tab-panel">
+      <div class="main-header">
+        <h2>Review Queue</h2>
+        <div class="header-actions">
+          <button class="btn btn-ghost" onclick="loadReviewQueue()">↻ Refresh</button>
+        </div>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:14px;" id="review-list">
+        <div class="empty-state"><div class="spinner"></div><div style="margin-top:12px;">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- Lifecycle Monitor tab (Requirement 9) -->
+    <div id="tab-lifecycle" class="tab-panel">
+      <div class="main-header">
+        <h2>Promise Lifecycle & Fulfillment Monitor</h2>
+        <div class="header-actions">
+          <button class="btn btn-danger" onclick="scanFulfillment()">🔍 Scan Breaches</button>
+          <button class="btn btn-ghost" onclick="loadLifecycle()">↻ Refresh</button>
+        </div>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+        <div class="stats-grid" id="lifecycle-stats-grid">
+          <div class="stat-card"><div class="stat-label">Loading commitments…</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="filters-bar">
+            <span class="section-title">Tracked Commitments</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--color-text-muted);" id="lifecycle-count">—</span>
+          </div>
+          <table>
+            <thead><tr>
+              <th>ID</th><th>Type</th><th>Quote</th><th>Lifecycle State</th><th>Due Date</th><th>Governing Rule</th><th>Action</th>
+            </tr></thead>
+            <tbody id="lifecycle-tbody"><tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:30px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Models Used tab (Section 3.17 & Cost Awareness) -->
+    <div id="tab-models" class="tab-panel">
+      <div class="main-header">
+        <h2>Models Used & Cost Awareness</h2>
+        <div class="header-actions">
+          <button class="btn btn-ghost" onclick="loadModelsUsed()">↻ Refresh</button>
+        </div>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+        <div class="stats-grid" id="models-cost-grid">
+          <div class="stat-card">
+            <div class="stat-label">Cost / Verified Msg</div>
+            <div class="stat-value" id="cost-per-msg" style="color:var(--color-brand-accent);font-size:24px;">$0.00015</div>
+            <div class="stat-sub">per safe interaction</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Model Cost</div>
+            <div class="stat-value" id="total-cost" style="font-size:24px;">$0.00</div>
+            <div class="stat-sub">across all calls</div>
+          </div>
+          <div class="stat-card allowed">
+            <div class="stat-label">Estimated Savings</div>
+            <div class="stat-value" id="est-savings" style="color:var(--color-allowed);font-size:24px;">$0.00</div>
+            <div class="stat-sub">from minimal reasoning & caching</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="filters-bar">
+            <span class="section-title">Aggregated Model Calls</span>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Model Name</th><th>Total Invocations</th><th>Avg Latency</th><th>Input Tokens</th><th>Output Tokens</th><th>Cost (USD)</th>
+            </tr></thead>
+            <tbody id="models-summary-tbody"><tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:30px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <div class="filters-bar">
+            <span class="section-title">Pipeline Breakdown by Stage</span>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Stage</th><th>Model</th><th>Calls</th><th>Avg Latency</th><th>Input Tokens</th><th>Output Tokens</th><th>Cost (USD)</th>
+            </tr></thead>
+            <tbody id="models-stages-tbody"><tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:30px;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rules Editor tab -->
+    <div id="tab-rules" class="tab-panel">
+      <div class="main-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <h2>Business Rules Editor</h2>
+          <span class="badge" id="rules-policy-ver-badge" style="background:var(--color-surface-2);color:var(--color-brand-accent);font-size:12px;font-weight:700;">Version: v1.0</span>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="saveRules()">💾 Save Rules</button>
+        </div>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:16px;">
+        <div class="rules-form">
+          <div class="form-row">
+            <label class="form-label" for="rule-max-discount">
+              Max Discount (%) <span>Maximum authorised discount any agent can offer</span>
+            </label>
+            <input class="form-input" id="rule-max-discount" type="number" min="0" max="100" step="1" value="" />
+            <div class="form-error" id="err-max-discount">Must be between 0 and 100.</div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="rule-refund-window">
+              Refund Window (days) <span>Maximum days a refund can be promised</span>
+            </label>
+            <input class="form-input" id="rule-refund-window" type="number" min="1" max="365" step="1" value="" />
+            <div class="form-error" id="err-refund-window">Must be between 1 and 365.</div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="rule-shipping-days">
+              Standard Shipping (days) <span>Default delivery window for standard shipping</span>
+            </label>
+            <input class="form-input" id="rule-shipping-days" type="number" min="1" max="30" step="1" value="" />
+            <div class="form-error" id="err-shipping-days">Must be between 1 and 30.</div>
+          </div>
+          <div class="save-feedback" id="save-feedback"></div>
+        </div>
+        <div style="color:var(--color-text-muted);font-size:11px;">
+          ⚠ Every rules change is appended to the cryptographic audit log with event_type <code style="font-family:var(--font-mono);">rules_change</code> and cannot be altered retroactively.
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Interaction Detail Modal -->
+<div class="modal-backdrop" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Interaction Detail</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <div class="empty-state"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const state = { currentPage: 1, totalInteractions: 0, limit: 20 };
+
+function toast(msg, type='info', ms=3500) {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==='success'?'✓':type==='error'?'✗':'ℹ'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), ms);
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  el.classList.add('active');
+  if (name === 'overview') loadOverview();
+  else if (name === 'interactions') loadInteractions();
+  else if (name === 'review') loadReviewQueue();
+  else if (name === 'lifecycle') loadLifecycle();
+  else if (name === 'models') loadModelsUsed();
+  else if (name === 'rules') loadRules();
+}
+
+function badge(status) { return `<span class="badge ${status}">${status}</span>`; }
+function fmtTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
+}
+function truncate(s, n=24) { return s && s.length > n ? s.slice(0,n)+'…' : (s||'—'); }
+
+async function checkAudit() {
+  const pill = document.getElementById('audit-pill');
+  const txt = document.getElementById('audit-pill-text');
+  txt.textContent = 'Checking…';
+  try {
+    const r = await fetch('/audit/verify');
+    const d = await r.json();
+    if (d.valid) {
+      pill.className = 'audit-pill';
+      txt.textContent = `Audit: ✓ ${d.entries_checked||0} entries OK`;
+    } else {
+      pill.className = 'audit-pill error';
+      txt.textContent = `Audit: ✗ TAMPERED`;
+      toast('Audit chain integrity violation detected!', 'error', 8000);
+    }
+  } catch(e) {
+    pill.className = 'audit-pill error';
+    txt.textContent = 'Audit: connection error';
+  }
+}
+
+async function loadOverview() {
+  try {
+    const r = await fetch('/stats');
+    const s = await r.json();
+    const total = s.total || 0;
+    const pct = (n) => total ? `${((n/total)*100).toFixed(1)}%` : '0%';
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card"><div class="stat-label">Total Interactions</div><div class="stat-value" style="color:var(--color-brand-accent)">${total}</div><div class="stat-sub">all time</div></div>
+      <div class="stat-card allowed"><div class="stat-label">Allowed</div><div class="stat-value">${s.allowed||0}</div><div class="stat-sub">${pct(s.allowed)} of total</div></div>
+      <div class="stat-card blocked"><div class="stat-label">Blocked</div><div class="stat-value">${s.blocked||0}</div><div class="stat-sub">${pct(s.blocked)} of total</div></div>
+      <div class="stat-card rewritten"><div class="stat-label">Rewritten</div><div class="stat-value">${s.rewritten||0}</div><div class="stat-sub">${pct(s.rewritten)} of total</div></div>
+      <div class="stat-card held"><div class="stat-label">Held / Review</div><div class="stat-value">${s.held||0}</div><div class="stat-sub">${pct(s.held)} of total</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Latency</div><div class="stat-value" style="color:var(--color-text-primary);font-size:24px;">${s.avg_latency_ms != null ? s.avg_latency_ms+'ms' : '—'}</div><div class="stat-sub">model average</div></div>
+    `;
+    const ri = await fetch('/interactions?limit=7&page=1');
+    const id = await ri.json();
+    const rows = id.interactions || [];
+    const tb = document.getElementById('overview-tbody');
+    if (!rows.length) {
+      tb.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:30px;">No interactions yet.</td></tr>`;
+    } else {
+      tb.innerHTML = rows.map(r => `
+        <tr onclick="openDetail('${r.id}')">
+          <td class="mono">${truncate(r.id,18)}</td>
+          <td>Agent ${r.agent_id||'?'}</td>
+          <td>${r.mode||'—'}</td>
+          <td>${badge(r.status||'received')}</td>
+          <td>${r.latency_ms != null ? r.latency_ms+'ms' : '—'}</td>
+          <td>${fmtTime(r.created_at)}</td>
+        </tr>`).join('');
+    }
+  } catch(e) {}
+}
+
+async function loadInteractions() {
+  const status = document.getElementById('filter-status').value;
+  const agent  = document.getElementById('filter-agent').value;
+  const params = new URLSearchParams({ page: state.currentPage, limit: state.limit });
+  if (status) params.set('status', status);
+  if (agent)  params.set('agent_id', agent);
+  try {
+    const r = await fetch(`/interactions?${params}`);
+    const d = await r.json();
+    state.totalInteractions = d.total || 0;
+    const rows = d.interactions || [];
+    const tb = document.getElementById('interactions-tbody');
+    if (!rows.length) {
+      tb.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:30px;">No interactions match.</td></tr>`;
+    } else {
+      tb.innerHTML = rows.map(r => `
+        <tr onclick="openDetail('${r.id}')">
+          <td class="mono">${truncate(r.id,18)}</td>
+          <td class="mono">${truncate(r.session_id,14)}</td>
+          <td>Agent ${r.agent_id||'?'}</td>
+          <td>${r.mode||'—'}</td>
+          <td>${badge(r.status||'received')}</td>
+          <td>${fmtTime(r.created_at)}</td>
+        </tr>`).join('');
+    }
+    const pages = Math.ceil(d.total / state.limit) || 1;
+    document.getElementById('page-info').textContent = `Page ${state.currentPage} of ${pages} — ${d.total} total`;
+    document.getElementById('btn-prev').disabled = state.currentPage <= 1;
+    document.getElementById('btn-next').disabled = state.currentPage >= pages;
+    document.getElementById('interactions-count').textContent = `${d.total} total`;
+  } catch(e) {}
+}
+
+function changePage(delta) {
+  state.currentPage = Math.max(1, state.currentPage + delta);
+  loadInteractions();
+}
+
+async function openDetail(id) {
+  document.getElementById('detail-modal').classList.add('open');
+  document.getElementById('modal-title').textContent = `Interaction: ${id}`;
+  document.getElementById('modal-body').innerHTML = `<div class="empty-state"><div class="spinner"></div></div>`;
+  try {
+    const r = await fetch(`/interactions/${id}`);
+    const d = await r.json();
+    const i = d.interaction;
+    const promises = d.promises || [];
+    document.getElementById('modal-body').innerHTML = `
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-ghost" style="border:1px solid var(--color-border);" onclick="replayModalInteraction('${i.id}')">↺ Replay Against Rules</button>
+        <a class="btn btn-ghost" href="/receipt/${i.id}" target="_blank">📄 Receipt Card PNG</a>
+        <a class="btn btn-ghost" href="/dispute/${i.id}" target="_blank">⚖ Dispute Report</a>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Status</div>
+        <div class="field-value">${badge(i.status)}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Customer Message</div>
+        <div class="field-value">${i.customer_message || '—'}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Agent Draft (Proposed)</div>
+        <div class="field-value">${i.proposed_reply || '—'}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Final Reply Sent</div>
+        <div class="field-value" style="border-left:3px solid var(--color-allowed)">${i.final_reply || '—'}</div>
+      </div>
+      ${promises.length ? `
+      <div class="field-group">
+        <div class="field-label">Extracted Promises & Explainability (${promises.length})</div>
+        <div class="field-value mono">${promises.map(p =>
+          `[${(p.verdict||'allow').toUpperCase()}] ${p.type}: ${p.value||'?'} ${p.unit||''} — "${p.quote||''}"
+  Rule: ${p.rule_name||'N/A'} | Threshold: ${p.threshold != null ? p.threshold : 'N/A'} | Lifecycle: ${p.lifecycle_state||'proposed'}
+  Reason: ${p.reason || 'None'}`
+        ).join('\n\n')}</div>
+      </div>` : ''}
+      <div class="field-group">
+        <div class="field-label">Audit & Identifiers</div>
+        <div class="field-value mono">ID: ${i.id} | Session: ${i.session_id} | Agent: ${i.agent_id} | Mode: ${i.mode}</div>
+      </div>
+    `;
+  } catch(e) {
+    document.getElementById('modal-body').innerHTML = `<div style="color:var(--color-blocked)">Failed to load detail.</div>`;
+  }
+}
+function closeModal() { document.getElementById('detail-modal').classList.remove('open'); }
+
+async function replayModalInteraction(id) {
+  try {
+    toast('Replaying interaction against current rules…', 'info');
+    const r = await fetch(`/interactions/${id}/replay`, { method: 'POST' });
+    const d = await r.json();
+    alert(
+      `↺ Replay Result for ${id}:\n\n` +
+      `• Original Policy: v${d.original.policy_version} -> Outcome: ${d.original.verdict.toUpperCase()}\n` +
+      `• Current Policy:  v${d.replayed.policy_version} -> Outcome: ${d.replayed.verdict.toUpperCase()}\n` +
+      `• Verdict Changed: ${d.verdict_changed ? 'YES (Policy Drift Detected)' : 'NO (Parity Intact)'}\n\n` +
+      `Summary: ${d.diff_summary}`
+    );
+  } catch(e) {
+    toast('Replay failed: ' + e.message, 'error');
+  }
+}
+
+async function loadReviewQueue() {
+  const el = document.getElementById('review-list');
+  el.innerHTML = `<div class="empty-state"><div class="spinner"></div><div style="margin-top:12px;">Loading held interactions…</div></div>`;
+  try {
+    const r = await fetch('/interactions?status=held&limit=50&page=1');
+    const d = await r.json();
+    const items = d.interactions || [];
+    const b = document.getElementById('review-badge');
+    if (items.length) { b.textContent = items.length; b.style.display = 'inline'; }
+    else { b.style.display = 'none'; }
+    if (!items.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">Review queue is empty</div><div>All held interactions have been reviewed.</div></div>`;
+      return;
+    }
+    el.innerHTML = items.map(i => `
+      <div class="review-card" id="rcard-${i.id}">
+        <div class="review-card-header">
+          <span class="review-card-id">${i.id}</span>
+          ${badge(i.status)}
+          <span class="meta-chip">Agent ${i.agent_id}</span>
+        </div>
+        <div class="review-messages">
+          <div class="msg-label">Customer</div><div class="msg-box">${i.customer_message||'—'}</div>
+          <div class="msg-label" style="margin-top:6px;">Draft</div><div class="msg-box proposed">${i.proposed_reply||'—'}</div>
+        </div>
+        <div class="review-actions">
+          <button class="btn btn-danger" onclick="reviewAction('${i.id}','reject')">✗ Reject</button>
+          <button class="btn btn-success" onclick="reviewAction('${i.id}','approve')">✓ Approve</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function reviewAction(id, action) {
+  try {
+    await fetch(`/review/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action })
+    });
+    toast(`Interaction ${action}d.`, 'success');
+    loadReviewQueue();
+  } catch(e) { toast('Review failed', 'error'); }
+}
+
+async function loadLifecycle() {
+  try {
+    const r = await fetch('/promises?limit=50');
+    const d = await r.json();
+    const s = d.summary || {};
+    document.getElementById('lifecycle-stats-grid').innerHTML = `
+      <div class="stat-card"><div class="stat-label">Total Commitments</div><div class="stat-value" style="color:var(--color-brand-accent)">${s.total||0}</div></div>
+      <div class="stat-card allowed"><div class="stat-label">Delivered (Sent)</div><div class="stat-value">${s.sent||0}</div></div>
+      <div class="stat-card allowed"><div class="stat-label">Fulfilled</div><div class="stat-value">${s.fulfilled||0}</div></div>
+      <div class="stat-card blocked"><div class="stat-label">Flagged / Breached</div><div class="stat-value">${s.flagged||0}</div></div>
+      <div class="stat-card blocked"><div class="stat-label">Failed / Blocked</div><div class="stat-value">${s.failed||0}</div></div>
+    `;
+    const rows = d.promises || [];
+    const tb = document.getElementById('lifecycle-tbody');
+    document.getElementById('lifecycle-count').textContent = `${d.total||0} total`;
+    if (!rows.length) {
+      tb.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:30px;">No commitments tracked yet.</td></tr>`;
+    } else {
+      tb.innerHTML = rows.map(p => `
+        <tr>
+          <td class="mono">${truncate(p.id, 14)}</td>
+          <td>${p.type}</td>
+          <td>"${truncate(p.quote, 28)}"</td>
+          <td>${badge(p.lifecycle_state||'proposed')}</td>
+          <td>${p.due_date || '—'}</td>
+          <td>${p.rule_name || '—'}</td>
+          <td>
+            ${p.lifecycle_state === 'sent' ? `<button class="btn btn-success" style="padding:2px 8px;font-size:10px;" onclick="markFulfilled('${p.id}')">✓ Fulfill</button>` : '—'}
+          </td>
+        </tr>`).join('');
+    }
+  } catch(e) {}
+}
+
+async function markFulfilled(pid) {
+  try {
+    await fetch(`/promises/${pid}/lifecycle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ state: 'fulfilled', actor: 'owner', note: 'Marked fulfilled by owner' })
+    });
+    toast('Commitment marked as fulfilled.', 'success');
+    loadLifecycle();
+  } catch(e) { toast('Failed to update commitment.', 'error'); }
+}
+
+async function scanFulfillment() {
+  toast('Scanning commitments against store inventory & delivery dates…', 'info');
+  try {
+    const r = await fetch('/promises/check-fulfillment', { method: 'POST' });
+    const d = await r.json();
+    toast(`Scan complete: ${d.flagged_commitments} commitment(s) flagged for follow-up.`, d.flagged_commitments > 0 ? 'error' : 'success');
+    loadLifecycle();
+  } catch(e) { toast('Scan failed', 'error'); }
+}
+
+async function loadModelsUsed() {
+  try {
+    const r = await fetch('/models/usage');
+    const d = await r.json();
+    const models = d.models || [];
+    const stages = d.by_stage || [];
+    const cm = d.cost_metrics || {};
+
+    if (document.getElementById('cost-per-msg')) {
+      document.getElementById('cost-per-msg').textContent = `$${(cm.cost_per_verified_message_usd || 0.00015).toFixed(5)}`;
+      document.getElementById('total-cost').textContent = `$${(cm.total_cost_usd || 0).toFixed(4)}`;
+      document.getElementById('est-savings').textContent = `$${(cm.total_savings_usd || 0).toFixed(4)}`;
+    }
+
+    document.getElementById('models-summary-tbody').innerHTML = models.length ? models.map(m => `
+      <tr>
+        <td style="font-weight:600;color:var(--color-brand-accent);">${m.model}</td>
+        <td>${m.calls}</td>
+        <td>${m.avg_latency_ms}ms</td>
+        <td>${m.total_input_tokens}</td>
+        <td>${m.total_output_tokens}</td>
+        <td class="mono">$${(m.cost_usd || 0).toFixed(4)}</td>
+      </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;padding:24px;">No model usage recorded yet.</td></tr>`;
+
+    document.getElementById('models-stages-tbody').innerHTML = stages.length ? stages.map(s => `
+      <tr>
+        <td class="mono">${s.stage}</td>
+        <td>${s.model}</td>
+        <td>${s.calls}</td>
+        <td>${s.avg_latency_ms}ms</td>
+        <td>${s.total_input_tokens}</td>
+        <td>${s.total_output_tokens}</td>
+        <td class="mono">$${(s.cost_usd || 0).toFixed(4)}</td>
+      </tr>`).join('') : `<tr><td colspan="7" style="text-align:center;padding:24px;">No stage data recorded yet.</td></tr>`;
+  } catch(e) {}
+}
+
+async function loadRules() {
+  try {
+    const r = await fetch('/rules');
+    const d = await r.json();
+    document.getElementById('rule-max-discount').value = d.max_discount_percent ?? '';
+    document.getElementById('rule-refund-window').value = d.refund_window_days ?? '';
+    document.getElementById('rule-shipping-days').value = d.standard_shipping_days ?? '';
+    const b = document.getElementById('rules-policy-ver-badge');
+    if (b) b.textContent = `Version: v${d.policy_version || '1.0'}`;
+  } catch(e) {}
+}
+
+async function saveRules() {
+  const maxD = parseFloat(document.getElementById('rule-max-discount').value);
+  const refW = parseFloat(document.getElementById('rule-refund-window').value);
+  const shipD = parseFloat(document.getElementById('rule-shipping-days').value);
+  const fb = document.getElementById('save-feedback');
+  fb.className = 'save-feedback';
+  try {
+    const r = await fetch('/rules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ max_discount_percent: maxD, refund_window_days: refW, standard_shipping_days: shipD })
+    });
+    if (!r.ok) throw new Error((await r.json()).detail);
+    const d = await r.json();
+    fb.className = 'save-feedback success';
+    fb.textContent = `✓ Rules updated to v${d.policy_version || '1.1'}. Audit log entry #${d.log_seq ?? '?'} recorded.`;
+    const b = document.getElementById('rules-policy-ver-badge');
+    if (b) b.textContent = `Version: v${d.policy_version || '1.1'}`;
+    toast(`Business rules updated (v${d.policy_version || '1.1'}).`, 'success');
+  } catch(e) {
+    fb.className = 'save-feedback error';
+    fb.textContent = `✗ Save failed: ${e.message}`;
+  }
+}
+
+(async function init() {
+  await checkAudit();
+  await loadOverview();
+})();
+</script>
+</body>
+</html>

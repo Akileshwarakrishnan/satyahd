@@ -1,0 +1,9 @@
+{
+  "policy_version": "1.0",
+  "max_discount_percent": 10.0,
+  "refund_window_days": 14,
+  "standard_shipping_days": 3,
+  "allow_unlimited_refund": false,
+  "require_evidence_for_damage_refund": true,
+  "min_confidence": 0.6
+}

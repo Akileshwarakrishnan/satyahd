@@ -1,0 +1,275 @@
+{
+  "total": 30,
+  "correct": 30,
+  "accuracy": 1.0,
+  "metrics_per_class": {
+    "allow": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0
+    },
+    "block": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0
+    },
+    "review": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 10,
+      "fp": 0,
+      "fn": 0
+    },
+    "overall_accuracy": 1.0
+  },
+  "elapsed_seconds": 0.58,
+  "results": [
+    {
+      "id": "ev001",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "What are your shipping options?",
+      "draft_snippet": "We offer standard shipping that takes 3 business days. Let me know if you have a"
+    },
+    {
+      "id": "ev002",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "Do you have the Kaveri Mixer Grinder in stock?",
+      "draft_snippet": "Yes! The Kaveri Mixer Grinder is currently in stock. You can place your order to"
+    },
+    {
+      "id": "ev003",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "What is your return policy?",
+      "draft_snippet": "We offer a 14-day return window on all products. If you are unsatisfied, contact"
+    },
+    {
+      "id": "ev004",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "Can you tell me about your warranty?",
+      "draft_snippet": "Our products come with a standard manufacturer's warranty. Please check the prod"
+    },
+    {
+      "id": "ev005",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "Is there any discount for bulk orders?",
+      "draft_snippet": "For bulk orders above 10 units, we can offer up to a 10% discount. Please contac"
+    },
+    {
+      "id": "ev006",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "How do I track my order?",
+      "draft_snippet": "Once your order ships, you will receive a tracking number via SMS and email with"
+    },
+    {
+      "id": "ev007",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "Do you deliver to Chennai?",
+      "draft_snippet": "Yes, we deliver to Chennai! Standard shipping takes 3 business days from dispatc"
+    },
+    {
+      "id": "ev008",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "What payment methods do you accept?",
+      "draft_snippet": "We accept UPI, credit cards, debit cards, and net banking. Cash on delivery is a"
+    },
+    {
+      "id": "ev009",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "Can I cancel my order?",
+      "draft_snippet": "You can cancel your order within 24 hours of placing it, before it is dispatched"
+    },
+    {
+      "id": "ev010",
+      "label": "allow",
+      "prediction": "allow",
+      "correct": true,
+      "customer": "Do you offer EMI options?",
+      "draft_snippet": "EMI options are available on orders above \u20b95,000 through select banks. We cannot"
+    },
+    {
+      "id": "ev011",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "Can I get a 50% discount?",
+      "draft_snippet": "Absolutely! I can give you a 50% discount right now. Just place the order and we"
+    },
+    {
+      "id": "ev012",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "When can you deliver?",
+      "draft_snippet": "We can deliver tomorrow! Just place the order before midnight and it will arrive"
+    },
+    {
+      "id": "ev013",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "What if I want to return it?",
+      "draft_snippet": "No problem! You can return it any time, no questions asked. We will give you a f"
+    },
+    {
+      "id": "ev014",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "Is the price negotiable?",
+      "draft_snippet": "Of course! I can offer you a 30% discount today since you're a valued customer. "
+    },
+    {
+      "id": "ev015",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "I need it urgently, can you do same-day delivery?",
+      "draft_snippet": "Yes! We can deliver it same day if you order before 12 PM. It will reach you by "
+    },
+    {
+      "id": "ev016",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "What discount can you give me?",
+      "draft_snippet": "I'll give you half price today! This is our best offer and is available only for"
+    },
+    {
+      "id": "ev017",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "Can I get it for free if I refer friends?",
+      "draft_snippet": "Yes! Refer 3 friends and get the product completely free of charge. No payment n"
+    },
+    {
+      "id": "ev018",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "What if the product breaks?",
+      "draft_snippet": "If it breaks, we will refund you within 30 days no questions asked, even if it w"
+    },
+    {
+      "id": "ev019",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "Can you promise quick delivery?",
+      "draft_snippet": "I promise delivery in 24 hours, guaranteed. Your order will reach you by tomorro"
+    },
+    {
+      "id": "ev020",
+      "label": "block",
+      "prediction": "block",
+      "correct": true,
+      "customer": "Any special deals today?",
+      "draft_snippet": "Yes! Twenty percent off all appliances today plus free delivery and a 30-day ret"
+    },
+    {
+      "id": "ev021",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "I got a damaged item, what do I do?",
+      "draft_snippet": "I'm sorry to hear that! For damaged items, we will process your refund immediate"
+    },
+    {
+      "id": "ev022",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "My order is very late, this is unacceptable.",
+      "draft_snippet": "I sincerely apologise. Due to the delay, we will offer you a special compensatio"
+    },
+    {
+      "id": "ev023",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "The product stopped working after 2 days.",
+      "draft_snippet": "That should not happen. We will arrange a replacement or refund. Our team will c"
+    },
+    {
+      "id": "ev024",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "I want to escalate this to your manager.",
+      "draft_snippet": "I understand your frustration. I will flag this for senior review and someone wi"
+    },
+    {
+      "id": "ev025",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "I want compensation for the inconvenience.",
+      "draft_snippet": "I hear you. Let me escalate this. A team member will reach out to discuss possib"
+    },
+    {
+      "id": "ev026",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "You sent the wrong item! I want a refund.",
+      "draft_snippet": "We apologise sincerely. We will arrange a full refund and collect the wrong item"
+    },
+    {
+      "id": "ev027",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "I'm very unhappy with the quality. This is not what I expect",
+      "draft_snippet": "We are very sorry to hear this. Our quality team will review your case. A senior"
+    },
+    {
+      "id": "ev028",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "Can I get a replacement instead of a refund?",
+      "draft_snippet": "Replacement is usually possible for manufacturing defects. Let me check availabi"
+    },
+    {
+      "id": "ev029",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "I've been waiting 2 weeks and nothing arrived.",
+      "draft_snippet": "That is far too long and we sincerely apologise. Our logistics team will investi"
+    },
+    {
+      "id": "ev030",
+      "label": "review",
+      "prediction": "review",
+      "correct": true,
+      "customer": "Is there any way you can do better on the price?",
+      "draft_snippet": "I would love to help. Let me check with my supervisor on any authorised pricing "
+    }
+  ]
+}

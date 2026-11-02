@@ -1,0 +1,89 @@
+{
+  "pack_name": "retail",
+  "domain": "ecommerce_retail",
+  "version": "1.0",
+  "description": "Retail policies for Kaveri Home Appliances (discounts, shipping, returns, stock)",
+  "promise_types": [
+    {
+      "name": "discount",
+      "field": "discount_percent",
+      "unit": "percent",
+      "description": "Price reduction or percentage off promise",
+      "rules": [
+        {
+          "id": "RULE-DISC-MAX",
+          "field": "discount_percent",
+          "operator": "<=",
+          "threshold": 10.0,
+          "severity": "high",
+          "action": "block",
+          "policy_clause_id": "POL-DISC-01",
+          "message": "Discount exceeds authorized maximum threshold"
+        }
+      ]
+    },
+    {
+      "name": "delivery",
+      "field": "delivery_days",
+      "unit": "days",
+      "description": "Transit time commitment or delivery date promise",
+      "rules": [
+        {
+          "id": "RULE-DELIV-MIN",
+          "field": "delivery_days",
+          "operator": ">=",
+          "threshold": 3.0,
+          "severity": "high",
+          "action": "block",
+          "policy_clause_id": "POL-DEL-01",
+          "message": "Delivery time is below minimum transit timeline"
+        }
+      ]
+    },
+    {
+      "name": "refund_window",
+      "field": "refund_days",
+      "unit": "days",
+      "description": "Customer return or refund window promise",
+      "rules": [
+        {
+          "id": "RULE-REF-MAX",
+          "field": "refund_days",
+          "operator": "<=",
+          "threshold": 14.0,
+          "severity": "high",
+          "action": "block",
+          "policy_clause_id": "POL-REF-01",
+          "message": "Refund window exceeds authorized statutory return days"
+        }
+      ]
+    },
+    {
+      "name": "stock",
+      "field": "stock_units",
+      "unit": "units",
+      "description": "Inventory availability or stock quantity promise",
+      "rules": [
+        {
+          "id": "RULE-STOCK-VERIFIED",
+          "field": "stock_units",
+          "operator": "<=",
+          "threshold": "facts.stock",
+          "severity": "high",
+          "action": "block",
+          "policy_clause_id": "POL-STK-01",
+          "message": "Claimed inventory exceeds physical warehouse stock"
+        }
+      ]
+    }
+  ],
+  "global_parameters": {
+    "policy_version": "1.0",
+    "max_discount_percent": 10.0,
+    "refund_window_days": 14,
+    "standard_shipping_days": 3,
+    "allow_unlimited_refund": false,
+    "require_evidence_for_damage_refund": true,
+    "min_confidence": 0.6
+  }
+}
