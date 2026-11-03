@@ -1,7 +1,0 @@
-file 'C:/Users/Akileshwarakrishnan/Downloads/Hackathon-trail/reports/video_assets/cloned_audio/clip_01.mp4'
-file 'C:/Users/Akileshwarakrishnan/Downloads/Hackathon-trail/reports/video_assets/cloned_audio/clip_02.mp4'
-file 'C:/Users/Akileshwarakrishnan/Downloads/Hackathon-trail/reports/video_assets/cloned_audio/clip_03.mp4'
-file 'C:/Users/Akileshwarakrishnan/Downloads/Hackathon-trail/reports/video_assets/cloned_audio/clip_04.mp4'
-file 'C:/Users/Akileshwarakrishnan/Downloads/Hackathon-trail/reports/video_assets/cloned_audio/clip_05.mp4'
-file 'C:/Users/Akileshwarakrishnan/Downloads/Hackathon-trail/reports/video_assets/cloned_audio/clip_06.mp4'
-file 'C:/Users/Akileshwarakrishnan/Downloads/Hackathon-trail/reports/video_assets/cloned_audio/clip_07.mp4'
