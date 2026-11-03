@@ -106,7 +106,7 @@ def detect_fashion_intents(text: str) -> list[str]:
         intents.append("season_suitability")
     if any(w in t for w in ("thallubadi", "offer", "discount", "kammi", "kuraika", "vilai")):
         intents.append("price_and_discount")
-    if any(w in t for w in ("stretch irukuma", "stretchable-aa", "flexibility", "stretchy")):
+    if any(w in t for w in ("stretch irukuma", "stretchable-aa", "stretchable", "flexibility", "stretchy")):
         intents.append("stretch")
     if any(w in t for w in ("soft-aa", "uruthuma", "rough-aa", "feel", "touch", "hand feel")):
         intents.append("fabric_feel")
@@ -114,29 +114,44 @@ def detect_fashion_intents(text: str) -> list[str]:
         intents.append("care_wash")
     if any(w in t for w in ("size pathuma", "alavu", "fitting", "measurements")):
         intents.append("fit_and_sizing")
-    if any(w in t for w in ("thirumba", "return panna", "refund")):
-        intents.append("returns_exchange")
+    if any(w in t for w in ("return", "returns", "exchange", "refund", "money back", "thirumba", "return panna")):
+        if "returns_exchange" not in intents:
+            intents.append("returns_exchange")
 
     # 3. GSM & Fabric Weight
     if "gsm" in t or any(w in t for w in ("fabric weight", "thickness", "how thick", "how heavy", "lightweight", "heavyweight")):
         intents.append("gsm_weight")
 
-    # 4. Material Composition (FR-1, FR-9)
-    if any(w in t for w in ("material", "fabric", "composition", "blend", "what is it made of", "pure cotton", "pure linen", "silk", "linen", "wool", "materiel")):
-        intents.append("material_composition")
-
-    # 5. Fabric Feel & Texture
-    if any(w in t for w in ("feel", "soft", "itchy", "scratchy", "coarse", "breathable", "airy", "texture", "smooth", "comfortable")):
+    # 4. Fabric Feel & Texture (FR-1 typo resilient: brethable, breathable, feel, soft)
+    is_feel_query = any(w in t for w in (
+        "feel", "soft", "itchy", "scratchy", "coarse", "breathable", "brethable", "breathab",
+        "airy", "texture", "smooth", "comfortable", "hand feel", "on skin", "touch"
+    )) or "fabric feel" in t
+    if is_feel_query:
         if "fabric_feel" not in intents:
             intents.append("fabric_feel")
 
-    # 6. Stretch & Mobility
-    if any(w in t for w in ("stretch", "stretchy", "elastic", "spandex", "elastane", "squat", "bend", "tight across")):
+    # 5. Stretch & Mobility (FR-1 typo resilient: strechy, strech, stretchy)
+    is_stretch_query = any(w in t for w in (
+        "stretch", "stretchy", "strechy", "strech", "elastic", "spandex", "elastane",
+        "squat", "bend", "flexibility", "flexible", "tight across"
+    ))
+    if is_stretch_query:
         if "stretch" not in intents:
             intents.append("stretch")
 
-    # 7. Fit & Sizing (FR-4)
-    if any(w in t for w in ("fit", "size", "sizing", "tight", "loose", "oversized", "baggy", "slim", "chest", "waist", "will it fit", "size chart", "measurements")):
+    # 6. Material Composition (FR-1, FR-9)
+    # Strictly for composition/blend inquiries, avoiding feel queries like "how does fabric feel"
+    is_mat_query = any(w in t for w in (
+        "material", "matrial", "metarial", "materiel", "composition", "blend", "what is it made of",
+        "pure cotton", "pure linen", "pure silk", "pure merino"
+    )) or ("fabric" in t and not is_feel_query and "gsm" not in t and "weight" not in t)
+    if is_mat_query:
+        if "material_composition" not in intents:
+            intents.append("material_composition")
+
+    # 7. Fit & Sizing (FR-1 typo resilient, FR-4)
+    if any(w in t for w in ("fit", "fitting", "fiting", "size", "sizing", "tight", "loose", "oversized", "baggy", "slim", "chest", "waist", "will it fit", "size chart", "measurements")):
         if "fit_and_sizing" not in intents:
             intents.append("fit_and_sizing")
 
@@ -145,7 +160,7 @@ def detect_fashion_intents(text: str) -> list[str]:
         intents.append("transparency")
 
     # 9. Colors & Variants
-    if any(w in t for w in ("color", "colors", "colour", "colours", "black", "white", "blue", "green", "shades", "variants", "what about in")):
+    if any(w in t for w in ("color", "colors", "colour", "colours", "colur", "black", "white", "blue", "green", "shades", "variants", "what about in")):
         intents.append("colors_and_variants")
 
     # 10. Care Instructions & Shrinkage
@@ -263,6 +278,24 @@ def format_fashion_response(
         )
         return reply, ["See Aura Linen Shirt", "See CloudSoft Tee", "Notify Me on Restock"], True, 1.0, False
 
+    # ── Compound: Fit and Stretch ─────────────────────────────────────────────
+    if "fit_and_sizing" in intents and "stretch" in intents:
+        reply = (
+            f"The {p_name} is tailored with a {p_fit} and features {p_stretch}. "
+            f"This gives you a sharp silhouette with complete freedom of movement. "
+            f"Would you like recommendations on sizing or available colors?"
+        )
+        return reply, chips, True, 0.99, False
+
+    # ── Compound: Stretch and Fabric Feel / Breathability ──────────────────────
+    if "stretch" in intents and "fabric_feel" in intents:
+        reply = (
+            f"The {p_name} features {p_stretch}. "
+            f"On the body, it has a {p_feel} "
+            f"Would you like to explore available sizes or colors?"
+        )
+        return reply, chips, True, 0.99, False
+
     # ── 1. GSM & Fabric Weight ────────────────────────────────────────────────
     if "gsm_weight" in intents:
         weight_desc = "lightweight and breezy" if p_gsm < 200 else ("mid-to-heavyweight with clean structure" if p_gsm < 280 else "cozy, dense knit")
@@ -356,8 +389,9 @@ def format_fashion_response(
 
     # ── 9. Care Instructions & Laundry ────────────────────────────────────────
     if "care_wash" in intents:
+        clean_care = p_care.rstrip('.')
         reply = (
-            f"For easy maintenance: {p_care}. "
+            f"For easy maintenance: {clean_care}. "
             f"Following these steps preserves the fiber luster and prevents unwanted shrinkage. "
             f"Would you like to know about shipping and returns?"
         )
@@ -383,15 +417,14 @@ def format_fashion_response(
 
     if "shipping_delivery" in intents:
         reply = (
-            f"Standard shipping takes {product.get('shipping_days', 3)} business days to your address with end-to-end tracking. "
-            f"We also offer a 7-day hassle-free return and exchange window. "
-            f"Can I help you finalize your size or color selection?"
+            f"Standard shipping takes {product.get('shipping_days', 3)} business days to your doorstep with full tracking. "
+            f"Would you like to check available sizes or colors?"
         )
         return reply, ["Available Sizes", "Return Policy", "Material Details"], True, 0.99, False
 
     if "returns_exchange" in intents:
         reply = (
-            f"We provide a 7-day return and exchange window for unworn items with original tags intact. "
+            f"We provide a 7-day return policy for unworn items with original tags intact. "
             f"If the fit isn't perfect, our courier will pick it up directly from your doorstep. "
             f"Would you like me to help you choose the right size now?"
         )
@@ -401,8 +434,8 @@ def format_fashion_response(
     if "greeting" in intents:
         openers = [
             f"Hello! I'm your store styling assistant. We're currently featuring our {p_name} (₹{p_price:,}). How can I help you style your look today?",
-            f"Welcome! Looking for comfortable, stylish apparel? Our {p_name} is our top recommendation today. Would you like to explore its material and fit?",
-            f"Hi there! Happy to assist you. What can I tell you about the {p_name}—fabric feel, sizing, or colors?",
+            f"Hello and welcome! Looking for comfortable, stylish apparel? Our {p_name} is our top recommendation today. Would you like to explore its material and fit?",
+            f"Hello there! Happy to assist you. What can I tell you about the {p_name}—fabric feel, sizing, or colors?",
         ]
         reply = random.choice(openers)
         return reply, ["Material & feel", "Size chart", "Available colors"], True, 1.0, False

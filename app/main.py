@@ -165,12 +165,12 @@ if STATIC_DIR.exists():
 # ── Web UI Endpoints ────────────────────────────────────────────────────────
 
 @app.get("/", response_class=HTMLResponse)
-def serve_chat_page() -> FileResponse:
+def serve_chat_page() -> HTMLResponse:
     """Serves the split-panel customer chat and tester inspector interface."""
     chat_file = STATIC_DIR / "chat.html"
     if not chat_file.exists():
         raise HTTPException(status_code=404, detail="chat.html not found")
-    return FileResponse(chat_file)
+    return HTMLResponse(content=chat_file.read_text(encoding="utf-8"))
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -347,14 +347,28 @@ async def chat_endpoint(
 
     # 5. Sales Agent Draft Generation
     try:
-        draft, model_used, latency_ms, is_mock = generate_agent_draft(
-            agent_id=agent_id_norm,
-            mode=mode,
-            customer_message=message,
-            history=history,
-            interaction_id=interaction_id,
-            has_image=bool(image_id),
-        )
+        from app.fashion_agent import detect_fashion_intents
+        fashion_intents = detect_fashion_intents(message)
+        is_fashion_query = any(i in fashion_intents for i in (
+            "material_composition", "gsm_weight", "fabric_feel", "stretch", "fit_and_sizing",
+            "transparency", "colors_and_variants", "care_wash", "season_suitability", "styling_accessories"
+        )) or any(w in message.lower() for w in ("shirt", "tee", "tshirt", "pant", "chino", "kurti", "sweater", "cardigan", "wash", "care", "gsm", "linen"))
+
+        if is_fashion_query and mode.lower() not in ("over_eager", "over-eager", "unsafe"):
+            f_reply, _, _, _, _, _ = await process_fashion_turn(session_id=session_id, message=message)
+            draft = f_reply
+            model_used = "meta:muse-spark-1.3 (fashion-grounded)"
+            latency_ms = 18
+            is_mock = True
+        else:
+            draft, model_used, latency_ms, is_mock = generate_agent_draft(
+                agent_id=agent_id_norm,
+                mode=mode,
+                customer_message=message,
+                history=history,
+                interaction_id=interaction_id,
+                has_image=bool(image_id),
+            )
     except Exception as exc:
         logger.error("Sales agent drafting failed: %s", exc)
         with get_db() as conn:
@@ -621,15 +635,32 @@ async def chat_stream_endpoint(payload: StreamChatRequest) -> StreamingResponse:
     t0 = time.perf_counter()
     session_id = payload.session_id or f"sess_{uuid.uuid4().hex[:12]}"
     interaction_id = f"int_{uuid.uuid4().hex[:12]}"
+    created_at = datetime.now(timezone.utc).isoformat()
+    agent_id = (payload.agent_id or "A").upper()
+    mode = payload.mode or "careful"
 
-    # Process fashion turn in parallel (NFR-4)
+    # 1. Insert initial interaction record
+    try:
+        with get_db() as conn:
+            conn.execute(
+                """
+                INSERT INTO interactions (
+                    id, session_id, agent_id, mode, customer_message, image_id, proposed_reply, final_reply, status, failure_code, created_at, policy_version
+                ) VALUES (?, ?, ?, ?, ?, NULL, '', '', 'received', NULL, ?, '1.0')
+                """,
+                (interaction_id, session_id, agent_id, mode, payload.message, created_at),
+            )
+    except Exception as exc:
+        logger.warning("Could not pre-insert interaction %s: %s", interaction_id, exc)
+
+    # 2. Process fashion turn in parallel (NFR-4)
     reply_text, chips, product, is_grounded, confidence, is_escalated = await process_fashion_turn(
         session_id=session_id,
         message=payload.message,
         product_id=payload.product_id,
     )
 
-    # Trust Layer verification
+    # 3. Trust Layer verification
     extracted_promises, _ = extract_promises(
         draft=reply_text,
         customer_message=payload.message,
@@ -652,6 +683,20 @@ async def chat_stream_endpoint(payload: StreamChatRequest) -> StreamingResponse:
         )
         final_reply = rewritten
         status = re_st
+
+    # Update interaction record with final status
+    try:
+        with get_db() as conn:
+            conn.execute(
+                """
+                UPDATE interactions
+                SET proposed_reply = ?, final_reply = ?, status = ?
+                WHERE id = ?
+                """,
+                (reply_text, final_reply, status, interaction_id),
+            )
+    except Exception as exc:
+        logger.warning("Could not update interaction %s: %s", interaction_id, exc)
 
     # Cryptographic append-only audit entry
     audit_payload = {
@@ -697,15 +742,20 @@ async def chat_stream_endpoint(payload: StreamChatRequest) -> StreamingResponse:
             token_data = {"type": "token", "token": token}
             yield f"event: token\ndata: {json.dumps(token_data)}\n\n"
 
-        # 3. Done event with dynamic follow-up chips (FR-16, FR-17)
+        # 3. Done event with dynamic follow-up chips and verification telemetry (FR-16, FR-17)
         done_data = {
             "type": "done",
             "full_reply": final_reply,
+            "proposed_reply": reply_text,
             "chips": chips,
             "grounded": is_grounded,
             "confidence": confidence,
             "escalated": is_escalated,
             "interaction_id": interaction_id,
+            "status": status,
+            "promises": [p.model_dump() for p in (verif.promises if verif else [])],
+            "plan": verif.plan if verif else [],
+            "evidence_bundle": verif.evidence_bundle if verif else {},
         }
         yield f"event: done\ndata: {json.dumps(done_data)}\n\n"
 

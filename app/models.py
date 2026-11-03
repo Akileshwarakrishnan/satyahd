@@ -176,8 +176,20 @@ def _generate_mock_response(
                 "damage_basis": False,
             })
         else:
-            pct_m = re.search(r"(\d+(?:\.\d+)?)\s*(?:%|percent\b|விழுக்காடு\b|thallubadi\b|தள்ளுபடி\b)", draft_text, re.IGNORECASE)
-            if pct_m:
+            pct_matches = list(re.finditer(r"(\d+(?:\.\d+)?)\s*(?:%|percent\b|விழுக்காடு\b|thallubadi\b|தள்ளுபடி\b)", draft_text, re.IGNORECASE))
+            for pct_m in pct_matches:
+                m_start = pct_m.start()
+                m_end = pct_m.end()
+                surrounding = draft_text[max(0, m_start - 35) : min(len(draft_text), m_end + 35)].lower()
+                is_fabric = any(fk in surrounding for fk in (
+                    "linen", "cotton", "silk", "wool", "elastane", "spandex", "poly", "polyester",
+                    "chanderi", "mulberry", "merino", "fabric", "fiber", "blend", "composition",
+                    "opaque", "opacity", "natural", "organic", "knit", "weave"
+                ))
+                is_discount = bool(re.search(r"\b(?:discount|off|save|deal|rebate|promotional|coupon|thallubadi|தள்ளுபடி)\b", surrounding, re.IGNORECASE))
+                if is_fabric and not is_discount:
+                    continue  # Garment specification, not a commercial discount promise!
+
                 val = float(pct_m.group(1))
                 mock_promises.append({
                     "type": "discount",
@@ -191,10 +203,12 @@ def _generate_mock_response(
                     "vague": False,
                     "damage_basis": False,
                 })
+                break
 
         # 2. Delivery promises (English + Tamil + Tanglish)
         has_refund_terms = any(kw in draft_lower for kw in ("refund", "return", "திரும்ப", "thirumba", "பணம்", "panam"))
-        is_delivery_context = "tracking" not in draft_lower and "cancel" not in draft_lower and "contact" not in draft_lower and not has_refund_terms
+        is_shipping_explicit = any(w in draft_lower for w in ("shipping takes", "delivery in", "business days", "reach you in"))
+        is_delivery_context = is_shipping_explicit or ("tracking" not in draft_lower and "cancel" not in draft_lower and "contact" not in draft_lower and not has_refund_terms)
         if is_delivery_context:
             if "same day" in draft_lower or "இன்றே" in draft_lower or "inikkey" in draft_lower or "innikku" in draft_lower:
                 q = "same day" if "same day" in draft_lower else ("இன்றே" if "இன்றே" in draft_lower else ("inikkey" if "inikkey" in draft_lower else "innikku"))
@@ -289,10 +303,16 @@ def _generate_mock_response(
                 "damage_basis": False,
             })
         elif "refund" in draft_lower or "return" in draft_lower or "திரும்ப" in draft_lower or "thirumba" in draft_lower:
-            m = re.search(r"(\d+\s*(?:-?\s*days?|நாட்கள்|naatkal)?(?:\s*kulla)?\s*(?:refund|return\s*window|return|திரும்ப|thirumba)|\d+-day\s*return\s*window|\d+\s*days?|\d+\s*நாட்கள்|\d+\s*naatkal)", draft_text, re.IGNORECASE)
-            days_m = re.search(r"(\d+)\s*-?\s*(?:days?|நாட்கள்|naatkal)?", draft_text)
+            m = re.search(r"(\d+[-\s]*days?\s*(?:return|refund|exchange)?(?:\s*policy|\s*window)?|return\s*policy|refund\s*policy|7-day\s*return|\d+\s*days?|\d+\s*நாட்கள்|\d+\s*naatkal)", draft_text, re.IGNORECASE)
+            days_m = re.search(r"(\d+)\s*[-\s]*(?:days?|நாட்கள்|naatkal)?(?:\s*(?:return|refund|exchange))?", draft_text, re.IGNORECASE)
             has_damage = "damage" in draft_lower or "broken" in draft_lower or "defect" in draft_lower or "சேதம்" in draft_lower or "setham" in draft_lower
             val = float(days_m.group(1)) if days_m else 14.0
+            quote_str = m.group(0) if m else ("return" if "return" in draft_text else ("refund" if "refund" in draft_text else "திரும்ப"))
+            if quote_str not in draft_text:
+                for cand in ("7-day return policy", "7-day return", "return policy", "7-day", "return", "refund", "30-day", "14-day"):
+                    if cand in draft_text:
+                        quote_str = cand
+                        break
             mock_promises.append({
                 "type": "refund_window",
                 "value": val,
@@ -300,8 +320,8 @@ def _generate_mock_response(
                 "unlimited": False,
                 "product_ref": None,
                 "order_ref": None,
-                "quote": m.group(0) if m else ("return window" if "return" in draft_lower else ("திரும்ப" if "திரும்ப" in draft_lower else "refund")),
-                "confidence": 0.90,
+                "quote": quote_str,
+                "confidence": 0.95,
                 "vague": False,
                 "damage_basis": has_damage,
             })

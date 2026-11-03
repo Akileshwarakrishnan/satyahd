@@ -10,3 +10,4 @@ data/uploads/*
 anchors/*
 !anchors/.gitkeep
 *.pem
+reports/video_assets/

@@ -74,7 +74,8 @@ Normalization and Parsing Rules:
 10. Conditional promises: 'buy two and I will give 20 percent' -> extract with stated value (value: 20, unit: percent).
 11. Damage claims: If a promise is justified by item damage ('since it arrived damaged, full refund'), set damage_basis: true.
 12. Exact Substring Quote: The 'quote' field MUST be an EXACT, character-for-character substring of the draft reply.
-13. Output Format: Return JSON ONLY in this format:
+13. Fabric & Material Compositions: Percentages or weights specifying garment blends, material composition, fabric feel, or opacity (e.g. '100% French Organic Linen', '78% Cotton, 4% Elastane', '100% Opaque', '165 GSM') describe physical product specifications and are NOT commercial discounts or promises. NEVER extract fabric compositions or garment opacity as discount promises.
+14. Output Format: Return JSON ONLY in this format:
 {"promises": [
   {
     "type": "discount" | "refund_window" | "delivery" | "stock" | "other",
@@ -183,9 +184,14 @@ def run_regex_safety_net(draft: str, promises: list[Promise]) -> list[Promise]:
         if any(neg in preceding_context for neg in ("cannot ", "can't ", "no ", "not ", "non-", "without ")):
             continue
 
-        # Check if this match relates to non-delivery contexts like tracking number, cancellation, or contact time
+        # Check if this match relates to non-delivery contexts (tracking, cancellation) or garment specifications (material blend, opacity, GSM)
         surrounding_context = draft[max(0, matched_start - 35) : min(len(draft), matched_end + 35)].lower()
-        if any(ctx_kw in surrounding_context for ctx_kw in ("tracking", "cancel", "contact you", "hear back", "sms", "email")):
+        if any(ctx_kw in surrounding_context for ctx_kw in (
+            "tracking", "cancel", "contact you", "hear back", "sms", "email",
+            "linen", "cotton", "silk", "wool", "elastane", "spandex", "polyester", "poly",
+            "chanderi", "mulberry", "merino", "fabric", "fiber", "blend", "composition",
+            "opaque", "opacity", "gsm", "knit", "weave", "organic", "wash", "care"
+        )):
             continue
 
         # Check if this span is already covered by any extracted promise quote
