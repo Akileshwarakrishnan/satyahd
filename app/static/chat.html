@@ -532,6 +532,17 @@
     }
 
     /* Chat Messages Thread */
+    @keyframes bubbleAppear {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -546,6 +557,8 @@
       display: flex;
       flex-direction: column;
       max-width: 82%;
+      animation: bubbleAppear 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
     }
 
     .chat-bubble-row.customer {
@@ -617,7 +630,7 @@
       border: 1px solid #332b26;
       color: var(--11x--support-champagne);
       cursor: pointer;
-      transition: all var(--transition-fast);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, background 0.22s ease, color 0.22s ease;
       font-weight: 500;
     }
 
@@ -625,7 +638,8 @@
       background: var(--11x--support-champagne);
       color: #050505;
       border-color: var(--11x--support-champagne);
-      box-shadow: 0 0 14px rgba(214, 180, 163, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(214, 180, 163, 0.35);
     }
 
     /* Animated 3-Dot Typing Indicator (NFR-3, UX-1) */
@@ -680,7 +694,13 @@
       border-radius: 50%;
       background: var(--11x--warn-amber);
       box-shadow: 0 0 10px var(--11x--warn-amber);
-      animation: pulseGreen 1s infinite ease-in-out;
+      animation: pulseAmberRing 1.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes pulseAmberRing {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 170, 0, 0.75); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 9px rgba(255, 170, 0, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 170, 0, 0); }
     }
 
     /* Thumbs Up / Down Feedback & Actions (AN-3) */
@@ -963,6 +983,7 @@
        4. RIGHT PANEL: RUNTIME GUARDRAIL INSPECTOR (11x Telemetry Deck)
        ========================================================================== */
     .tester-panel {
+      position: relative;
       background: #080808;
       overflow-y: auto;
       padding: 20px;
@@ -970,6 +991,24 @@
       flex-direction: column;
       gap: 16px;
       border-left: 1px solid var(--theme--border);
+    }
+
+    .tester-panel::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(0, 229, 117, 0.7) 50%, transparent 100%);
+      box-shadow: 0 0 10px rgba(0, 229, 117, 0.8);
+      animation: scanlineSweep 4.5s linear infinite;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    @keyframes scanlineSweep {
+      0% { top: 0; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
     }
 
     .tester-header {
@@ -999,15 +1038,29 @@
       border: 1px solid var(--11x--support-terracotta);
       padding: 4px 10px;
       border-radius: var(--radius-pill);
+      transition: all var(--transition-fast);
+    }
+
+    .tester-tag:hover {
+      box-shadow: 0 0 12px rgba(214, 180, 163, 0.3);
+      border-color: var(--11x--support-champagne);
     }
 
     /* Telemetry Card */
     .tester-card {
+      position: relative;
       background: #101010;
       border: 1px solid var(--theme--border);
       border-radius: var(--radius-16);
       padding: 16px;
       box-shadow: var(--shadow-subtle);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tester-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(214, 180, 163, 0.35);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), 0 0 15px rgba(214, 180, 163, 0.1);
     }
 
     .tester-card-title {
