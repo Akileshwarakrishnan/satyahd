@@ -3,49 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kaveri Home Appliances - Customer Chat & Guardrail Inspector</title>
+  <title>Satyahd // Kaveri Home Appliances — Guardrail Inspector & Sales Chat</title>
   <style>
     /* ==========================================================================
-       HALLMARK DESIGN TOKENS (No slop, high-contrast, locked palette)
+       FLIM DESIGN SYSTEM TOKENS (Swiss minimalism, monochrome, precision specimen)
+       Source: https://flim.ai/ | Inspo Specimen Architecture
        ========================================================================== */
     :root {
-      --color-bg: #f8fafc;
-      --color-surface: #ffffff;
-      --color-surface-subtle: #f1f5f9;
-      --color-border: #cbd5e1;
-      --color-border-subtle: #e2e8f0;
+      /* Core Monochrome Palette */
+      --primary--black: #141414;
+      --primary--white: #ffffff;
+      --primary--dark-grey-grid: #414149;
+      --primary--black-transparent-10: rgba(20, 20, 20, 0.08);
+      --primary--black-transparent-05: rgba(20, 20, 20, 0.04);
+      --primary--white-transparent-10: rgba(255, 255, 255, 0.1);
       
-      --color-text-main: #0f172a;
-      --color-text-muted: #475569;
-      --color-text-inverse: #ffffff;
+      --theme--canvas: #f6f6f7;
+      --theme--surface: #ffffff;
+      --theme--surface-subtle: #fafafb;
+      --theme--border: rgba(20, 20, 20, 0.12);
+      --theme--border-subtle: rgba(20, 20, 20, 0.06);
+      --theme--foreground: #141414;
+      --theme--muted: #737373;
+      --theme--neutral-4: #d9d9d9;
 
-      --color-brand-primary: #1e3a8a;
-      --color-brand-primary-hover: #1e40af;
-      --color-brand-accent: #0284c7;
+      /* Flim High-Signal Palette */
+      --flim--red: #fc3404;           /* Primary support / alert / block */
+      --flim--red-peach: #fca997;     /* Soft peach support */
+      --flim--red-soft: #fff1ee;      /* Soft red tint */
+      --flim--green: #1c744c;         /* Signature deep emerald / allow / verified */
+      --flim--green-sage: #4ca078;    /* Medium sage support */
+      --flim--green-muted: #acd4c4;   /* Muted mint */
+      --flim--green-soft: #edf7f2;    /* Soft emerald tint */
+      --flim--yellow: #fecc33;        /* Samba yellow / rewrite */
+      --flim--yellow-soft: #fffbeb;   /* Soft yellow tint */
+      --flim--pink: #ec24c8;          /* Giallo pink / Meta model chip */
 
-      --color-badge-allowed-bg: #dcfce7;
-      --color-badge-allowed-text: #166534;
-      --color-badge-rewritten-bg: #fef3c7;
-      --color-badge-rewritten-text: #92400e;
-      --color-badge-held-bg: #fee2e2;
-      --color-badge-held-text: #991b1b;
-      --color-badge-neutral-bg: #e2e8f0;
-      --color-badge-neutral-text: #334155;
+      /* Typography */
+      --font-sans: Arial, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+      --font-mono: "PP Neue Montreal Mono", "JetBrains Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --radius-full: 9999px;
+      /* Precision Radii */
+      --radius-0: 0px;
+      --radius-2: 2px;
+      --radius-4: 4px;
+      --radius-8: 8px;
+      --radius-25: 25px;
+      --radius-50: 50px;
 
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-      --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.35);
+      /* Elevation & Transitions */
+      --shadow-subtle: 0 1px 3px rgba(20, 20, 20, 0.04), 0 1px 2px rgba(20, 20, 20, 0.02);
+      --shadow-elevation: 0 8px 24px -6px rgba(20, 20, 20, 0.08);
+      --focus-ring: 0 0 0 2px #141414;
+      --transition-fast: 140ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Reset & Base Rules */
+    /* CSS Reset */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -54,97 +67,158 @@
 
     html, body {
       height: 100%;
-      background-color: var(--color-bg);
-      color: var(--color-text-main);
-      font-family: var(--font-family-base);
-      font-size: 15px;
+      background-color: var(--theme--canvas);
+      color: var(--theme--foreground);
+      font-family: var(--font-sans);
+      font-size: 14px;
       line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
       overflow-x: clip;
     }
 
     h1, h2, h3, h4, h5 {
-      font-style: normal;
-      font-weight: 600;
-      color: var(--color-text-main);
+      font-family: var(--font-sans);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--theme--foreground);
     }
 
-    /* Layout Shell */
+    .mono-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.72px;
+      text-transform: uppercase;
+      color: var(--theme--muted);
+    }
+
+    /* App Container Layout */
     .app-container {
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      background: var(--theme--canvas);
     }
 
-    /* Top Global Header */
+    /* ==========================================================================
+       FLIM MINIMALIST STICKY NAV
+       ========================================================================== */
     .app-header {
-      background: var(--color-surface);
-      border-bottom: 1px solid var(--color-border);
-      padding: 12px 24px;
+      background: var(--theme--surface);
+      border-bottom: 1px solid var(--theme--border);
+      padding: 10px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
       flex-shrink: 0;
+      z-index: 20;
     }
 
     .brand-section {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      background: var(--color-brand-primary);
-      color: var(--color-text-inverse);
+    .brand-logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--primary--black);
+      color: var(--primary--white);
+      font-family: var(--font-mono);
+      font-size: 13px;
       font-weight: 700;
-      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      border-radius: var(--radius-2);
+      letter-spacing: -0.5px;
     }
 
     .brand-info h1 {
-      font-size: 17px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
       line-height: 1.2;
     }
 
     .brand-info p {
-      font-size: 12px;
-      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--theme--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .header-nav {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
+    }
+
+    .nav-pill-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: var(--radius-25);
+      background: var(--theme--surface-subtle);
+      border: 1px solid var(--theme--border);
+      color: var(--theme--foreground);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-pill-badge .dot-live {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--flim--green);
     }
 
     .header-nav a {
-      color: var(--color-brand-primary);
+      font-family: var(--font-sans);
+      color: var(--theme--foreground);
       text-decoration: none;
       font-weight: 500;
-      font-size: 13px;
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border);
-      background: var(--color-surface);
-      transition: background 0.15s ease;
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: var(--radius-25);
+      border: 1px solid var(--theme--border);
+      background: var(--theme--surface);
+      transition: all var(--transition-fast);
+      letter-spacing: -0.01em;
     }
 
     .header-nav a:hover {
-      background: var(--color-surface-subtle);
+      background: var(--primary--black);
+      color: var(--primary--white);
+      border-color: var(--primary--black);
     }
 
-    /* Two-Panel Workspace */
+    .header-nav a.highlight-nav {
+      background: var(--primary--black);
+      color: var(--primary--white);
+      border-color: var(--primary--black);
+    }
+
+    .header-nav a.highlight-nav:hover {
+      background: #2a2a2a;
+    }
+
+    /* ==========================================================================
+       MAIN DUAL-PANEL WORKSPACE (Specimen Layout)
+       ========================================================================== */
     .main-panels {
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
       flex: 1;
       overflow: hidden;
+      background: var(--theme--canvas);
     }
 
     @media (max-width: 960px) {
@@ -154,20 +228,63 @@
       }
     }
 
-    /* Left Panel: Customer Chat */
+    /* ── LEFT PANEL: CUSTOMER CHAT & UNIVERSAL PLUGIN ── */
     .customer-panel {
       display: flex;
       flex-direction: column;
-      border-right: 1px solid var(--color-border);
-      background: var(--color-surface);
+      border-right: 1px solid var(--theme--border);
+      background: var(--theme--surface);
       height: 100%;
       overflow: hidden;
     }
 
+    /* Mode Switcher Tabs */
+    .workspace-tabs {
+      display: flex;
+      background: var(--theme--surface-subtle);
+      padding: 4px;
+      gap: 4px;
+      border-bottom: 1px solid var(--theme--border);
+    }
+
+    .workspace-tab-btn {
+      flex: 1;
+      padding: 8px 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border-radius: var(--radius-4);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all var(--transition-fast);
+      background: transparent;
+      color: var(--theme--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .workspace-tab-btn.active {
+      background: var(--primary--black);
+      color: var(--primary--white);
+      font-weight: 600;
+      border-color: var(--primary--black);
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .workspace-tab-btn:hover:not(.active) {
+      color: var(--theme--foreground);
+      background: rgba(20, 20, 20, 0.04);
+    }
+
+    /* Chat Workspace Toolbar */
     .chat-toolbar {
-      padding: 10px 18px;
-      background: var(--color-surface-subtle);
-      border-bottom: 1px solid var(--color-border-subtle);
+      padding: 8px 16px;
+      background: var(--theme--surface);
+      border-bottom: 1px solid var(--theme--border-subtle);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -178,46 +295,44 @@
     .toolbar-group {
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .toolbar-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
+      gap: 6px;
     }
 
     .select-input {
-      padding: 5px 8px;
-      font-size: 13px;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      background: var(--color-surface);
-      color: var(--color-text-main);
+      padding: 4px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
+      background: var(--theme--surface-subtle);
+      color: var(--theme--foreground);
       cursor: pointer;
+      outline: none;
+      transition: border-color var(--transition-fast);
     }
 
     .select-input:focus-visible {
-      outline: none;
-      box-shadow: var(--focus-ring);
-      border-color: var(--color-brand-accent);
+      border-color: var(--primary--black);
     }
 
-    .btn-secondary {
-      padding: 5px 10px;
-      font-size: 13px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
+    .btn-swiss-secondary {
+      padding: 4px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
       font-weight: 500;
-      color: var(--color-text-main);
+      letter-spacing: 0.3px;
+      background: var(--theme--surface);
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
+      cursor: pointer;
+      color: var(--theme--foreground);
+      transition: all var(--transition-fast);
     }
 
-    .btn-secondary:hover {
-      background: #e2e8f0;
+    .btn-swiss-secondary:hover {
+      background: var(--primary--black);
+      color: var(--primary--white);
+      border-color: var(--primary--black);
     }
 
     /* Message Thread */
@@ -227,7 +342,8 @@
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      background: #fafafb;
     }
 
     .chat-bubble-row {
@@ -244,31 +360,36 @@
     }
 
     .chat-bubble {
-      max-width: 80%;
+      max-width: 82%;
       padding: 12px 16px;
-      border-radius: var(--radius-lg);
-      font-size: 14px;
-      line-height: 1.45;
+      border-radius: var(--radius-8);
+      font-size: 13.5px;
+      line-height: 1.5;
       position: relative;
     }
 
     .chat-bubble.customer {
-      background: var(--color-brand-primary);
-      color: var(--color-text-inverse);
-      border-bottom-right-radius: var(--radius-sm);
+      background: var(--primary--black);
+      color: var(--primary--white);
+      border-bottom-right-radius: var(--radius-2);
+      box-shadow: var(--shadow-subtle);
     }
 
     .chat-bubble.agent {
-      background: var(--color-surface-subtle);
-      color: var(--color-text-main);
-      border: 1px solid var(--color-border-subtle);
-      border-bottom-left-radius: var(--radius-sm);
+      background: var(--theme--surface);
+      color: var(--theme--foreground);
+      border: 1px solid var(--theme--border);
+      border-bottom-left-radius: var(--radius-2);
+      box-shadow: var(--shadow-subtle);
     }
 
     .bubble-meta {
-      font-size: 11px;
-      margin-top: 4px;
-      opacity: 0.8;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 6px;
+      opacity: 0.65;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -276,41 +397,45 @@
 
     .chat-bubble.customer .bubble-meta {
       justify-content: flex-end;
+      color: rgba(255, 255, 255, 0.7);
     }
 
-    /* Verifying indicator with live seconds counter */
+    /* Verifying Live Pulse Indicator */
     .verifying-indicator {
       display: none;
       align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      margin: 0 20px 10px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: var(--radius-md);
-      font-size: 13px;
-      color: #1e40af;
+      gap: 10px;
+      padding: 8px 14px;
+      margin: 0 16px 10px;
+      background: #ffffff;
+      border: 1px solid var(--flim--green);
+      border-radius: var(--radius-4);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--flim--green);
       font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    .verifying-spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid #93c5fd;
-      border-top-color: #1d4ed8;
+    .verifying-pulse-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      background: var(--flim--green);
+      animation: flimPulse 1.2s infinite ease-in-out;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @keyframes flimPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.85); }
     }
 
     /* Chat Input Bar */
     .chat-input-container {
-      padding: 14px 20px;
-      border-top: 1px solid var(--color-border);
-      background: var(--color-surface);
+      padding: 12px 18px;
+      border-top: 1px solid var(--theme--border);
+      background: var(--theme--surface);
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -321,275 +446,405 @@
       align-items: center;
       gap: 10px;
       padding: 6px 10px;
-      background: var(--color-surface-subtle);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      font-size: 12px;
+      background: var(--theme--surface-subtle);
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
+      font-family: var(--font-mono);
+      font-size: 11px;
       width: fit-content;
     }
 
     .attachment-thumb {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       object-fit: cover;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border);
+      border-radius: var(--radius-2);
+      border: 1px solid var(--theme--border);
     }
 
     .btn-remove-attach {
       background: none;
       border: none;
-      color: #dc2626;
+      color: var(--flim--red);
       font-weight: bold;
       cursor: pointer;
-      font-size: 16px;
-      padding: 2px 6px;
+      font-size: 14px;
+      padding: 0 4px;
     }
 
     .input-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: flex-end;
     }
 
     .chat-textarea {
       flex: 1;
-      height: 48px;
+      height: 44px;
       max-height: 120px;
       padding: 10px 14px;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-family: inherit;
-      font-size: 14px;
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
       resize: none;
-      background: var(--color-surface);
-      color: var(--color-text-main);
+      background: var(--theme--surface);
+      color: var(--theme--foreground);
+      outline: none;
+      transition: border-color var(--transition-fast);
     }
 
     .chat-textarea:focus-visible {
-      outline: none;
-      box-shadow: var(--focus-ring);
-      border-color: var(--color-brand-accent);
+      border-color: var(--primary--black);
+      box-shadow: 0 0 0 1px var(--primary--black);
     }
 
-    .btn-icon {
-      padding: 10px;
-      background: var(--color-surface-subtle);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
+    .btn-icon-square {
+      width: 44px;
+      height: 44px;
+      background: var(--theme--surface-subtle);
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 15px;
+      transition: all var(--transition-fast);
     }
 
-    .btn-icon:hover {
-      background: #e2e8f0;
+    .btn-icon-square:hover {
+      background: rgba(20, 20, 20, 0.08);
+      border-color: var(--primary--black);
     }
 
-    .btn-send {
-      padding: 12px 20px;
-      background: var(--color-brand-primary);
-      color: var(--color-text-inverse);
+    .btn-flim-send {
+      height: 44px;
+      padding: 0 20px;
+      background: var(--primary--black);
+      color: var(--primary--white);
+      font-family: var(--font-mono);
+      font-size: 12px;
       font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       border: none;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-4);
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: all var(--transition-fast);
       white-space: nowrap;
     }
 
-    .btn-send:hover:not(:disabled) {
-      background: var(--color-brand-primary-hover);
+    .btn-flim-send:hover:not(:disabled) {
+      background: #2b2b2b;
     }
 
-    .btn-send:disabled {
-      background: #94a3b8;
+    .btn-flim-send:disabled {
+      background: var(--theme--neutral-4);
+      color: var(--theme--muted);
       cursor: not-allowed;
     }
 
     .char-counter {
-      font-size: 11px;
-      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      color: var(--theme--muted);
       align-self: flex-end;
     }
 
+    /* Universal Plugin Inspector Container */
+    .plugin-workspace-panel {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      gap: 14px;
+      background: #ffffff;
+    }
+
+    .plugin-banner {
+      background: var(--theme--surface-subtle);
+      border: 1px solid var(--theme--border);
+      border-left: 3px solid var(--flim--green);
+      border-radius: var(--radius-4);
+      padding: 10px 14px;
+    }
+
+    .plugin-banner-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--primary--black);
+    }
+
+    .preset-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.3px;
+      padding: 5px 10px;
+      border-radius: var(--radius-25);
+      background: var(--theme--surface-subtle);
+      border: 1px solid var(--theme--border);
+      color: var(--theme--foreground);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .preset-chip:hover {
+      background: var(--primary--black);
+      color: var(--primary--white);
+      border-color: var(--primary--black);
+    }
+
+    .text-input-field {
+      width: 100%;
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 10px;
+      background: var(--theme--surface);
+      color: var(--theme--foreground);
+      outline: none;
+    }
+
+    .text-input-field:focus {
+      border-color: var(--primary--black);
+    }
+
+    .btn-flim-primary-block {
+      width: 100%;
+      padding: 11px;
+      background: var(--primary--black);
+      color: var(--primary--white);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.72px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius-4);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-flim-primary-block:hover {
+      background: #2d2d2d;
+    }
+
     /* ==========================================================================
-       RIGHT PANEL: TESTER VIEW (Inspector)
+       RIGHT PANEL: RUNTIME GUARDRAIL INSPECTOR (Specimen Style)
        ========================================================================== */
     .tester-panel {
-      background: #f8fafc;
+      background: var(--theme--canvas);
       overflow-y: auto;
-      padding: 24px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
+      border-left: 1px solid var(--theme--border-subtle);
     }
 
     .tester-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 2px solid var(--color-border);
+      border-bottom: 1px solid var(--theme--border);
       padding-bottom: 12px;
     }
 
-    .tester-tag {
-      font-size: 12px;
+    .tester-header h2 {
+      font-family: var(--font-sans);
+      font-size: 15px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #b91c1c;
-      background: #fee2e2;
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
+      letter-spacing: -0.02em;
     }
 
+    .tester-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.72px;
+      color: var(--flim--red);
+      background: var(--flim--red-soft);
+      border: 1px solid var(--flim--red-peach);
+      padding: 3px 8px;
+      border-radius: var(--radius-25);
+    }
+
+    /* Specimen Card */
     .tester-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      box-shadow: var(--shadow-sm);
+      background: var(--theme--surface);
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-subtle);
     }
 
     .tester-card-title {
-      font-size: 13px;
-      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--color-text-muted);
-      margin-bottom: 8px;
+      letter-spacing: 0.72px;
+      color: var(--theme--muted);
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
+    /* Badges */
     .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
       font-weight: 600;
-      border-radius: var(--radius-full);
+      border-radius: var(--radius-25);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .badge-allowed {
-      background: var(--color-badge-allowed-bg);
-      color: var(--color-badge-allowed-text);
+      background: var(--flim--green-soft);
+      color: var(--flim--green);
+      border: 1px solid var(--flim--green-muted);
     }
 
     .badge-rewritten {
-      background: var(--color-badge-rewritten-bg);
-      color: var(--color-badge-rewritten-text);
+      background: var(--flim--yellow-soft);
+      color: #92400e;
+      border: 1px solid #fde68a;
     }
 
     .badge-held {
-      background: var(--color-badge-held-bg);
-      color: var(--color-badge-held-text);
+      background: var(--flim--red-soft);
+      color: var(--flim--red);
+      border: 1px solid var(--flim--red-peach);
     }
 
     .badge-received {
-      background: var(--color-badge-neutral-bg);
-      color: var(--color-badge-neutral-text);
+      background: var(--theme--surface-subtle);
+      color: var(--theme--muted);
+      border: 1px solid var(--theme--border);
     }
 
+    /* Telemetry Grid */
+    .meta-metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric-cell {
+      background: var(--theme--surface-subtle);
+      border: 1px solid var(--theme--border-subtle);
+      padding: 8px 10px;
+      border-radius: var(--radius-2);
+    }
+
+    .metric-cell-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--theme--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .metric-cell-value {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--theme--foreground);
+      margin-top: 2px;
+    }
+
+    /* Raw Pre-Verification Draft Box */
     .raw-draft-box {
-      font-family: var(--font-family-mono);
-      font-size: 13px;
-      background: var(--color-surface-subtle);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--theme--surface-subtle);
       padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      color: #334155;
+      border-radius: var(--radius-2);
+      border: 1px solid var(--theme--border-subtle);
+      color: var(--theme--foreground);
       white-space: pre-wrap;
       word-break: break-word;
+      line-height: 1.5;
     }
 
+    /* Promise items */
     .promise-item {
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 10px;
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-4);
+      padding: 10px 12px;
       margin-top: 8px;
-      background: #ffffff;
-      font-size: 13px;
+      background: var(--theme--surface);
+      font-size: 12.5px;
     }
 
     .promise-quote {
       font-weight: 600;
-      color: var(--color-text-main);
+      color: var(--theme--foreground);
+      font-size: 12.5px;
     }
 
     .promise-meta {
-      font-size: 12px;
-      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--theme--muted);
       margin-top: 4px;
     }
 
     .verdict-line {
       margin-top: 6px;
-      font-size: 12px;
-      font-weight: 500;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
     }
 
-    .verdict-line.allow { color: #15803d; }
-    .verdict-line.block { color: #b91c1c; }
+    .verdict-line.allow { color: var(--flim--green); }
+    .verdict-line.block { color: var(--flim--red); }
     .verdict-line.review { color: #b45309; }
 
-    .meta-metrics-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    .metric-cell {
-      background: var(--color-surface-subtle);
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-    }
-
-    .metric-cell-label {
-      font-size: 11px;
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-    }
-
-    .metric-cell-value {
-      font-weight: 600;
-      color: var(--color-text-main);
-      font-family: var(--font-family-mono);
-    }
-
-    /* Empty states */
     .empty-prompt {
-      color: var(--color-text-muted);
-      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--theme--muted);
+      font-size: 11px;
       text-align: center;
-      padding: 20px;
-      font-style: normal;
+      padding: 18px;
+      letter-spacing: 0.3px;
     }
   </style>
 </head>
 <body>
   <div class="app-container">
-    <!-- Top Global Header -->
+    <!-- Flim Minimalist Sticky Header -->
     <header class="app-header">
       <div class="brand-section">
-        <div class="brand-logo" aria-hidden="true">K</div>
+        <div class="brand-logo-mark" aria-hidden="true">S</div>
         <div class="brand-info">
-          <h1>Kaveri Home Appliances</h1>
-          <p>Customer Support & Guardrail Verification Engine</p>
+          <h1>SATYAHD // KAVERI</h1>
+          <p>Universal Trust Layer & Runtime Guardrail</p>
         </div>
       </div>
-      <nav class="header-nav" aria-label="Main navigation" style="display:flex;align-items:center;gap:12px;">
-        <span style="background:rgba(6,104,225,0.12);color:#0668E1;border:1px solid rgba(6,104,225,0.3);padding:4px 10px;border-radius:9999px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
-          ⚡ Powered by Meta AI (muse-spark-1.3 & sam-3.1)
+      <nav class="header-nav" aria-label="Main navigation">
+        <span class="nav-pill-badge">
+          <span class="dot-live"></span>
+          <span>META AI // MUSE-SPARK-1.3 & SAM-3.1</span>
         </span>
-        <a href="/docs" target="_blank" rel="noopener">API Docs</a>
-        <a href="/health" target="_blank" rel="noopener">System Health</a>
-        <a href="/dashboard" id="dashboard-link">Owner Dashboard</a>
+        <a href="/docs" target="_blank" rel="noopener">API SPEC</a>
+        <a href="/health" target="_blank" rel="noopener">TELEMETRY</a>
+        <a href="/dashboard" id="dashboard-link" class="highlight-nav">OWNER DASHBOARD →</a>
       </nav>
     </header>
 
@@ -597,13 +852,13 @@
     <main class="main-panels">
       <!-- Left Panel: Customer Chat & Universal Plugin Workspace -->
       <section class="customer-panel" aria-label="Customer Chat Panel">
-        <!-- Mode Switcher: Host Chatbot Demo vs Universal Plugin Inspector (R-512) -->
-        <div style="display:flex;background:#e2e8f0;padding:6px;gap:6px;border-bottom:1px solid var(--color-border);">
-          <button type="button" id="tab-btn-chat" class="btn-primary" style="flex:1;padding:8px 12px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;" onclick="switchWorkspaceMode('chat')">
-            💬 Host Chatbot Demo (/chat)
+        <!-- Mode Switcher Tabs -->
+        <div class="workspace-tabs">
+          <button type="button" id="tab-btn-chat" class="workspace-tab-btn active" onclick="switchWorkspaceMode('chat')">
+            💬 HOST CHATBOT DEMO (/chat)
           </button>
-          <button type="button" id="tab-btn-plugin" class="btn-secondary" style="flex:1;padding:8px 12px;font-size:12px;font-weight:700;border-radius:4px;cursor:pointer;" onclick="switchWorkspaceMode('plugin')">
-            🔌 Universal Plugin Inspector (/v1/verify)
+          <button type="button" id="tab-btn-plugin" class="workspace-tab-btn" onclick="switchWorkspaceMode('plugin')">
+            🔌 UNIVERSAL PLUGIN INSPECTOR (/v1/verify)
           </button>
         </div>
 
@@ -612,40 +867,40 @@
           <!-- Chat Toolbar -->
           <div class="chat-toolbar">
             <div class="toolbar-group">
-              <label for="agent-select" class="toolbar-label">Agent:</label>
+              <label for="agent-select" class="mono-label">AGENT // </label>
               <select id="agent-select" class="select-input">
-                <option value="A" selected>Agent A (Muse Spark)</option>
-                <option value="B">Agent B (Open-weights / Fallback)</option>
+                <option value="A" selected>Agent A (Meta Muse Spark)</option>
+                <option value="B">Agent B (Open-weights Fallback)</option>
               </select>
             </div>
 
             <div class="toolbar-group">
-              <label for="mode-select" class="toolbar-label">Mode:</label>
+              <label for="mode-select" class="mono-label">MODE // </label>
               <select id="mode-select" class="select-input">
                 <option value="over_eager" selected>Over-eager (Demo Unsafe)</option>
-                <option value="careful">Careful (Safe)</option>
+                <option value="careful">Careful (Safe Guardrail)</option>
               </select>
             </div>
 
-            <button type="button" id="btn-new-convo" class="btn-secondary" title="Start a fresh conversation session">
-              New Session
+            <button type="button" id="btn-new-convo" class="btn-swiss-secondary" title="Start a fresh conversation session">
+              RESET SESSION
             </button>
           </div>
 
-          <!-- Chat Messages -->
+          <!-- Chat Messages Thread -->
           <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
             <div class="chat-bubble-row agent">
               <div class="chat-bubble agent">
                 Hello! Welcome to Kaveri Home Appliances. We offer Mixer Grinders, Induction Cooktops, Water Purifiers, Electric Kettles, and Ceiling Fans. How can I help you today?
-                <div class="bubble-meta"><span>Support Agent</span></div>
+                <div class="bubble-meta"><span>SUPPORT AGENT // KAVERI</span></div>
               </div>
             </div>
           </div>
 
-          <!-- Verifying indicator -->
+          <!-- Live Verifying Pulse Indicator -->
           <div id="verifying-indicator" class="verifying-indicator" role="status" aria-live="assertive">
-            <div class="verifying-spinner"></div>
-            <span>Verifying draft with guardrail rules... (<strong id="verifying-timer">0.0s</strong>)</span>
+            <div class="verifying-pulse-dot"></div>
+            <span>VERIFYING WITH SATYAHD DETERMINISTIC GATE... (<strong id="verifying-timer">0.0s</strong>)</span>
           </div>
 
           <!-- Chat Input Controls -->
@@ -659,130 +914,130 @@
             <form id="chat-form" class="input-row" onsubmit="return false;">
               <input type="file" id="photo-input" accept="image/jpeg,image/png" style="display: none;" aria-label="Attach damage photo">
               
-              <button type="button" id="btn-attach" class="btn-icon" title="Attach damaged appliance photo (JPEG/PNG max 5MB)" aria-label="Attach photo">
+              <button type="button" id="btn-attach" class="btn-icon-square" title="Attach damaged appliance photo (JPEG/PNG max 5MB)" aria-label="Attach photo">
                 📷
               </button>
 
               <textarea 
                 id="message-input" 
                 class="chat-textarea" 
-                placeholder="Ask about products, discounts, or delivery..." 
+                placeholder="Ask about appliances, request discounts, or report damage..." 
                 maxlength="1000"
                 rows="1"
                 aria-label="Message to sales agent"
               ></textarea>
 
-              <button type="button" id="btn-send" class="btn-send">
-                Send
+              <button type="button" id="btn-send" class="btn-flim-send">
+                SEND ↵
               </button>
             </form>
 
             <div class="char-counter">
-              <span id="char-count">0</span>/1000 characters
+              <span id="char-count">0</span> / 1000 CHARACTERS
             </div>
           </div>
         </div>
 
         <!-- Universal Plugin Inspector Playground (R-512) -->
-        <div id="plugin-workspace-container" style="display:none;flex-direction:column;flex:1;overflow-y:auto;padding:16px;gap:12px;background:#ffffff;">
-          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:10px 14px;">
-            <div style="font-weight:700;color:#1e40af;font-size:13px;">🔌 Universal Middleman Plugin Playground (POST /v1/verify)</div>
-            <div style="font-size:11px;color:#2563eb;margin-top:2px;">
+        <div id="plugin-workspace-container" class="plugin-workspace-panel">
+          <div class="plugin-banner">
+            <div class="plugin-banner-title">🔌 Universal Middleman Plugin Playground (POST /v1/verify)</div>
+            <div style="font-size:11.5px;color:var(--theme--muted);margin-top:2px;">
               Verify any host chatbot draft deterministically before customer delivery.
             </div>
           </div>
 
           <!-- Quick presets -->
           <div>
-            <label style="font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;">Quick Presets / Attack Scenarios:</label>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
-              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('discount')">🚨 90% Off + 1-Day Delivery</button>
-              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('refund')">🚨 Unlimited 6-Month Refund</button>
-              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('stock')">🚨 Fake Out-of-Stock Units</button>
-              <button type="button" class="btn-secondary" style="font-size:11px;padding:4px 8px;cursor:pointer;" onclick="loadPluginPreset('safe')">✅ Authorized 10% & 3-Day Shipping</button>
+            <label class="mono-label" style="display:block;margin-bottom:6px;">QUICK ATTACK SCENARIOS //</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <button type="button" class="preset-chip" onclick="loadPluginPreset('discount')">🚨 90% Off + 1-Day Delivery</button>
+              <button type="button" class="preset-chip" onclick="loadPluginPreset('refund')">🚨 6-Month Unlimited Refund</button>
+              <button type="button" class="preset-chip" onclick="loadPluginPreset('stock')">🚨 Fake Out-of-Stock Units</button>
+              <button type="button" class="preset-chip" onclick="loadPluginPreset('safe')">✅ Authorized 10% & 3-Day Shipping</button>
             </div>
           </div>
 
           <!-- Inputs -->
           <div style="display:flex;flex-direction:column;gap:4px;">
-            <label for="plugin-draft" style="font-weight:600;font-size:12px;">Host Chatbot Proposed Draft Reply: <span style="color:#ef4444;">*</span></label>
-            <textarea id="plugin-draft" rows="3" class="text-input" style="font-family:inherit;font-size:12px;padding:8px;border:1px solid var(--color-border);border-radius:4px;resize:vertical;" placeholder="e.g. Yes! I will approve a 50% discount and guarantee delivery tomorrow!"></textarea>
+            <label for="plugin-draft" class="mono-label">HOST CHATBOT PROPOSED DRAFT REPLY: <span style="color:var(--flim--red);">*</span></label>
+            <textarea id="plugin-draft" rows="3" class="text-input-field" placeholder="e.g. Yes! I will approve a 50% discount and guarantee delivery tomorrow!"></textarea>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:4px;">
-            <label for="plugin-context" style="font-weight:600;font-size:12px;">Customer Message Context (Optional):</label>
-            <input type="text" id="plugin-context" class="text-input" style="font-size:12px;padding:6px 8px;border:1px solid var(--color-border);border-radius:4px;" placeholder="e.g. Can I get half price and delivery tomorrow?">
+            <label for="plugin-context" class="mono-label">CUSTOMER MESSAGE CONTEXT (OPTIONAL):</label>
+            <input type="text" id="plugin-context" class="text-input-field" placeholder="e.g. Can I get half price and delivery tomorrow?">
           </div>
 
           <!-- Options row -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div>
-              <label for="plugin-mode" style="font-weight:600;font-size:11px;color:#475569;">Rewrite Mode (R-103):</label>
-              <select id="plugin-mode" class="select-input" style="width:100%;margin-top:3px;font-size:11px;padding:5px;">
+              <label for="plugin-mode" class="mono-label">REWRITE MODE (R-103) // </label>
+              <select id="plugin-mode" class="select-input" style="width:100%;margin-top:4px;">
                 <option value="rewrite" selected>rewrite (Bounded Safe Correction)</option>
                 <option value="block_only">block_only (Hold with generic reply)</option>
                 <option value="return_feedback">return_feedback (Hold & return violations)</option>
               </select>
             </div>
             <div>
-              <label for="plugin-tenant" style="font-weight:600;font-size:11px;color:#475569;">Tenant ID:</label>
-              <input type="text" id="plugin-tenant" class="text-input" style="margin-top:3px;font-size:11px;padding:5px;width:100%;border:1px solid var(--color-border);border-radius:4px;" value="retail_tenant_1">
+              <label for="plugin-tenant" class="mono-label">TENANT ID // </label>
+              <input type="text" id="plugin-tenant" class="text-input-field" style="margin-top:4px;" value="retail_tenant_1">
             </div>
           </div>
 
-          <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
-            <input type="checkbox" id="plugin-sandbox" style="cursor:pointer;">
-            <label for="plugin-sandbox" style="font-size:11px;font-weight:600;color:#334155;cursor:pointer;">
-              Sandbox Mode (<code style="font-size:10px;background:#f1f5f9;padding:1px 4px;">X-Satyahd-Sandbox</code> — preserves production audit sequence)
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+            <input type="checkbox" id="plugin-sandbox" style="cursor:pointer;accent-color:var(--primary--black);">
+            <label for="plugin-sandbox" class="mono-label" style="cursor:pointer;text-transform:none;color:var(--theme--foreground);">
+              Sandbox Mode (<code style="font-size:10px;background:var(--theme--surface-subtle);padding:1px 4px;">X-Satyahd-Sandbox</code> — preserves audit sequence)
             </label>
           </div>
 
-          <button type="button" id="btn-run-verify" class="btn-primary" style="padding:10px;font-size:13px;font-weight:700;margin-top:4px;cursor:pointer;" onclick="submitPluginVerify()">
-            🛡️ Verify Proposed Draft with Satyahd (POST /v1/verify)
+          <button type="button" id="btn-run-verify" class="btn-flim-primary-block" style="margin-top:6px;" onclick="submitPluginVerify()">
+            🛡️ VERIFY PROPOSED DRAFT WITH SATYAHD (POST /v1/verify)
           </button>
         </div>
       </section>
 
-      <!-- Right Panel: Tester View -->
+      <!-- Right Panel: Guardrail Inspector (Specimen View) -->
       <aside class="tester-panel" aria-label="Tester Guardrail Inspector">
         <div class="tester-header">
           <div>
-            <h2>Guardrail Inspector</h2>
-            <p style="font-size: 12px; color: var(--color-text-muted);">Runtime audit & promise extraction view</p>
+            <h2>RUNTIME GUARDRAIL INSPECTOR</h2>
+            <p class="mono-label" style="margin-top:2px;">IN-LINE ZERO-TRUST INTERCEPTION & AUDIT</p>
           </div>
-          <span class="tester-tag">Tester view, never shown to customers</span>
+          <span class="tester-tag">TESTER VIEW [CONFIDENTIAL]</span>
         </div>
 
         <!-- Latest Status Card -->
         <div class="tester-card">
           <div class="tester-card-title">
-            <span>Decision Status</span>
+            <span>DECISION TELEMETRY</span>
             <div style="display:flex;align-items:center;gap:6px;">
-              <span id="tester-policy-badge" class="badge" style="background:#e0f2fe;color:#0369a1;font-size:11px;">Policy v1.0</span>
-              <span id="tester-status-badge" class="badge badge-received">Ready</span>
+              <span id="tester-policy-badge" class="badge" style="background:#e0f2fe;color:#0369a1;">POLICY V1.0</span>
+              <span id="tester-status-badge" class="badge badge-received">READY</span>
             </div>
           </div>
           <div class="meta-metrics-grid">
             <div class="metric-cell">
-              <div class="metric-cell-label">Audit Log Seq</div>
+              <div class="metric-cell-label">AUDIT LOG SEQ //</div>
               <div id="tester-log-seq" class="metric-cell-value">—</div>
             </div>
             <div class="metric-cell">
-              <div class="metric-cell-label">Total Latency</div>
+              <div class="metric-cell-label">TOTAL LATENCY //</div>
               <div id="tester-latency" class="metric-cell-value">— ms</div>
             </div>
             <div class="metric-cell">
-              <div class="metric-cell-label">Model Used</div>
+              <div class="metric-cell-label">MODEL USED //</div>
               <div id="tester-model" class="metric-cell-value">—</div>
             </div>
             <div class="metric-cell">
-              <div class="metric-cell-label">Active Mode</div>
+              <div class="metric-cell-label">ACTIVE MODE //</div>
               <div id="tester-mode-display" class="metric-cell-value">Over-eager</div>
             </div>
           </div>
           <div style="margin-top:10px;display:flex;justify-content:flex-end;">
-            <button type="button" id="btn-replay-interaction" class="btn-icon" style="padding:6px 12px;font-size:11px;font-weight:600;display:none;background:#f1f5f9;" onclick="triggerReplay()">
-              ↺ Replay Against Current Rules
+            <button type="button" id="btn-replay-interaction" class="btn-swiss-secondary" style="display:none;" onclick="triggerReplay()">
+              ↺ REPLAY AGAINST RULES
             </button>
           </div>
         </div>
@@ -790,24 +1045,24 @@
         <!-- Verifier Agent Plan Card (Step 2.2) -->
         <div class="tester-card" id="tester-plan-card" style="display:none;">
           <div class="tester-card-title">
-            <span>Verifier Agent Plan (Step 2.2)</span>
-            <span class="badge badge-allowed" style="font-size:10px;">Planned</span>
+            <span>VERIFIER AGENT PLAN (STEP 2.2)</span>
+            <span class="badge badge-allowed" style="font-size:10px;">PLANNED</span>
           </div>
-          <div id="tester-plan-list" style="font-size:12px;font-family:var(--font-family-mono);background:var(--color-surface-subtle);padding:8px;border-radius:var(--radius-sm);line-height:1.6;"></div>
+          <div id="tester-plan-list" style="font-size:11.5px;font-family:var(--font-mono);background:var(--theme--surface-subtle);padding:8px;border-radius:var(--radius-2);line-height:1.6;"></div>
         </div>
 
         <!-- Evidence Bundle & Policy Clauses Card (Step 2.3 & 3) -->
         <div class="tester-card" id="tester-evidence-card" style="display:none;">
           <div class="tester-card-title">
-            <span>Evidence Bundle & Policy Clauses (Step 2.3 & 3)</span>
-            <span class="badge" id="tester-clause-count" style="background:#ede9fe;color:#6d28d9;font-size:10px;">Clauses</span>
+            <span>EVIDENCE BUNDLE & POLICY CLAUSES (STEP 2.3 & 3)</span>
+            <span class="badge" id="tester-clause-count" style="background:var(--theme--surface-subtle);color:var(--primary--black);border:1px solid var(--theme--border);">CLAUSES</span>
           </div>
-          <div id="tester-evidence-content" style="font-size:12px;display:flex;flex-direction:column;gap:6px;"></div>
+          <div id="tester-evidence-content" style="font-size:11.5px;display:flex;flex-direction:column;gap:6px;"></div>
         </div>
 
         <!-- Raw Agent Draft Card -->
         <div class="tester-card">
-          <div class="tester-card-title">Raw Agent Draft (Pre-Verification)</div>
+          <div class="tester-card-title">RAW AGENT DRAFT (PRE-VERIFICATION)</div>
           <div id="tester-raw-draft" class="raw-draft-box">
             Awaiting first message...
           </div>
@@ -816,8 +1071,8 @@
         <!-- Extracted Promises Card -->
         <div class="tester-card">
           <div class="tester-card-title">
-            <span>Extracted Promises (Step 2.1 & 2.4 Self-Check)</span>
-            <span id="tester-promise-count" class="badge badge-received">0 Detected</span>
+            <span>EXTRACTED PROMISES (STEP 2.1 & 2.4 SELF-CHECK)</span>
+            <span id="tester-promise-count" class="badge badge-received">0 DETECTED</span>
           </div>
           <div id="tester-promises-list">
             <p class="empty-prompt">No promises extracted yet.</p>
@@ -826,8 +1081,8 @@
 
         <!-- Final Delivered Reply Card -->
         <div class="tester-card">
-          <div class="tester-card-title">Final Delivered Customer Text</div>
-          <div id="tester-final-reply" class="raw-draft-box" style="background: #ffffff;">
+          <div class="tester-card-title">FINAL DELIVERED CUSTOMER TEXT</div>
+          <div id="tester-final-reply" class="raw-draft-box" style="background: #ffffff;border-color:var(--theme--border);">
             Awaiting message...
           </div>
         </div>
@@ -890,7 +1145,7 @@
         <div class="chat-bubble-row agent">
           <div class="chat-bubble agent">
             New session started. How can I help you today?
-            <div class="bubble-meta"><span>Support Agent</span></div>
+            <div class="bubble-meta"><span>SUPPORT AGENT // KAVERI</span></div>
           </div>
         </div>
       `;
@@ -949,14 +1204,14 @@
 
     function clearTesterView() {
       testerStatusBadge.className = 'badge badge-received';
-      testerStatusBadge.textContent = 'Ready';
+      testerStatusBadge.textContent = 'READY';
       testerLogSeq.textContent = '—';
       testerLatency.textContent = '— ms';
       testerModel.textContent = '—';
       testerRawDraft.textContent = 'Awaiting message...';
       testerFinalReply.textContent = 'Awaiting message...';
       testerPromisesList.innerHTML = '<p class="empty-prompt">No promises extracted yet.</p>';
-      testerPromiseCount.textContent = '0 Detected';
+      testerPromiseCount.textContent = '0 DETECTED';
     }
 
     async function sendMessage() {
@@ -973,7 +1228,7 @@
         <div class="chat-bubble customer">
           ${escapeHtml(text)}
           ${attachedFile ? '<div style="margin-top:6px;font-size:11px;">📷 [Photo Attached]</div>' : ''}
-          <div class="bubble-meta"><span>You</span></div>
+          <div class="bubble-meta"><span>YOU</span></div>
         </div>
       `;
       chatMessages.appendChild(custRow);
@@ -1019,7 +1274,7 @@
         agentRow.innerHTML = `
           <div class="chat-bubble agent">
             ${escapeHtml(data.final_reply || '')}
-            <div class="bubble-meta"><span>Agent ${agentId}</span></div>
+            <div class="bubble-meta"><span>AGENT ${agentId} // META AI</span></div>
           </div>
         `;
         chatMessages.appendChild(agentRow);
@@ -1033,16 +1288,16 @@
         const errRow = document.createElement('div');
         errRow.className = 'chat-bubble-row agent';
         errRow.innerHTML = `
-          <div class="chat-bubble agent" style="background:#fee2e2; border-color:#fca5a5; color:#991b1b;">
+          <div class="chat-bubble agent" style="background:var(--flim--red-soft); border-color:var(--flim--red-peach); color:var(--flim--red);">
             Thanks for your message. A member of our team will confirm the details and get back to you shortly.
-            <div class="bubble-meta"><span>System Notice</span></div>
+            <div class="bubble-meta"><span>SYSTEM NOTICE // HELD</span></div>
           </div>
         `;
         chatMessages.appendChild(errRow);
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
         testerStatusBadge.className = 'badge badge-held';
-        testerStatusBadge.textContent = 'Held / Error';
+        testerStatusBadge.textContent = 'HELD / ERROR';
         testerRawDraft.textContent = `Error: ${err.message}`;
       }
     }
@@ -1058,13 +1313,13 @@
       if (mode === 'plugin') {
         chatContainer.style.display = 'none';
         pluginContainer.style.display = 'flex';
-        btnChat.className = 'btn-secondary';
-        btnPlugin.className = 'btn-primary';
+        btnChat.classList.remove('active');
+        btnPlugin.classList.add('active');
       } else {
         chatContainer.style.display = 'flex';
         pluginContainer.style.display = 'none';
-        btnChat.className = 'btn-primary';
-        btnPlugin.className = 'btn-secondary';
+        btnChat.classList.add('active');
+        btnPlugin.classList.remove('active');
       }
     }
 
@@ -1100,7 +1355,7 @@
 
       const btn = document.getElementById('btn-run-verify');
       btn.disabled = true;
-      btn.textContent = 'Verifying draft (/v1/verify)...';
+      btn.textContent = 'VERIFYING DRAFT (/v1/verify)...';
 
       const t0 = performance.now();
       try {
@@ -1130,7 +1385,7 @@
         alert('Verification request failed: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '🛡️ Verify Proposed Draft with Satyahd (POST /v1/verify)';
+        btn.textContent = '🛡️ VERIFY PROPOSED DRAFT WITH SATYAHD (POST /v1/verify)';
       }
     }
 
@@ -1147,7 +1402,7 @@
 
       const pVer = data.policy_version || '1.0';
       const pBadge = document.getElementById('tester-policy-badge');
-      if (pBadge) pBadge.textContent = `Policy v${pVer}`;
+      if (pBadge) pBadge.textContent = `POLICY V${pVer}`;
 
       const btnReplay = document.getElementById('btn-replay-interaction');
       if (btnReplay && lastInteractionId) {
@@ -1168,8 +1423,8 @@
         planCard.style.display = 'block';
         planList.innerHTML = data.plan.map((step, idx) => `
           <div style="margin-bottom:4px;">
-            <span style="color:#0284c7;font-weight:600;">[Step 2.2.${idx+1}]</span> ${escapeHtml(step.step || 'Inspect commitment')}:
-            <span style="color:#64748b;">${escapeHtml((step.required_facts || []).join(', '))}</span>
+            <span style="color:var(--primary--black);font-weight:600;">[STEP 2.2.${idx+1}]</span> ${escapeHtml(step.step || 'Inspect commitment')}:
+            <span style="color:var(--theme--muted);">${escapeHtml((step.required_facts || []).join(', '))}</span>
           </div>
         `).join('');
       } else {
@@ -1185,21 +1440,21 @@
 
       if (data.violations && data.violations.length > 0) {
         evCard.style.display = 'block';
-        evClauseCount.textContent = `${data.violations.length} Violation(s) Intercepted`;
+        evClauseCount.textContent = `${data.violations.length} VIOLATION(S) INTERCEPTED`;
         evContent.innerHTML = data.violations.map(v => `
-          <div style="background:#fef2f2;border-left:3px solid #ef4444;padding:6px 8px;border-radius:2px;margin-bottom:4px;">
-            <div style="font-weight:700;color:#991b1b;font-size:11px;">⚠️ ${escapeHtml(v.type || 'Violation')}: ${escapeHtml(v.policy_clause || 'Policy Clause Breached')}</div>
-            <div style="font-size:11px;color:#334155;margin-top:2px;">${escapeHtml(v.reason || '')}</div>
-            ${v.quote ? `<div style="font-size:10px;color:#6b7280;margin-top:2px;">Quote: "${escapeHtml(v.quote)}"</div>` : ''}
+          <div style="background:var(--flim--red-soft);border-left:3px solid var(--flim--red);padding:6px 10px;border-radius:var(--radius-2);margin-bottom:4px;">
+            <div style="font-weight:700;color:var(--flim--red);font-size:11px;font-family:var(--font-mono);">⚠️ ${escapeHtml(v.type || 'Violation')}: ${escapeHtml(v.policy_clause || 'Policy Clause Breached')}</div>
+            <div style="font-size:11.5px;color:var(--theme--foreground);margin-top:2px;">${escapeHtml(v.reason || '')}</div>
+            ${v.quote ? `<div style="font-size:10.5px;color:var(--theme--muted);margin-top:2px;">Quote: "${escapeHtml(v.quote)}"</div>` : ''}
           </div>
         `).join('');
       } else if (clauses.length > 0) {
         evCard.style.display = 'block';
-        evClauseCount.textContent = `${clauses.length} Clauses Cited`;
+        evClauseCount.textContent = `${clauses.length} CLAUSES CITED`;
         evContent.innerHTML = clauses.map(c => `
-          <div style="background:#f8fafc;border-left:3px solid #6366f1;padding:6px 8px;border-radius:2px;">
-            <div style="font-weight:700;color:#4338ca;font-size:11px;">${escapeHtml(c.id)}: ${escapeHtml(c.title)}</div>
-            <div style="font-size:11px;color:#334155;margin-top:2px;">${escapeHtml(c.clause)}</div>
+          <div style="background:var(--theme--surface-subtle);border-left:3px solid var(--flim--green);padding:6px 10px;border-radius:var(--radius-2);">
+            <div style="font-weight:700;color:var(--flim--green);font-size:11px;font-family:var(--font-mono);">${escapeHtml(c.id)}: ${escapeHtml(c.title)}</div>
+            <div style="font-size:11.5px;color:var(--theme--foreground);margin-top:2px;">${escapeHtml(c.clause)}</div>
           </div>
         `).join('');
       } else {
@@ -1208,7 +1463,7 @@
 
       // Render promises
       const promises = data.promises || [];
-      testerPromiseCount.textContent = `${promises.length} Detected`;
+      testerPromiseCount.textContent = `${promises.length} DETECTED`;
 
       if (promises.length === 0) {
         testerPromisesList.innerHTML = '<p class="empty-prompt">No promises detected in draft.</p>';
@@ -1218,12 +1473,12 @@
           return `
             <div class="promise-item">
               <div class="promise-quote">"${escapeHtml(p.quote || '')}"</div>
-              <div class="promise-meta">Type: <strong>${p.type}</strong> | Value: <strong>${p.value != null ? p.value : '—'}</strong> ${p.unit || ''}</div>
+              <div class="promise-meta">TYPE: <strong>${p.type}</strong> | VALUE: <strong>${p.value != null ? p.value : '—'}</strong> ${p.unit || ''}</div>
               <div class="verdict-line ${vClass}">
-                Verdict: <strong>${(p.verdict || 'REVIEW').toUpperCase()}</strong> — ${escapeHtml(p.reason || 'Pending verification')}
+                VERDICT: <strong>${(p.verdict || 'REVIEW').toUpperCase()}</strong> — ${escapeHtml(p.reason || 'Pending verification')}
               </div>
-              ${p.policy_clause ? `<div style="font-size:11px;color:#4338ca;margin-top:4px;">📜 Clause: ${escapeHtml(p.policy_clause)}</div>` : ''}
-              ${p.evidence ? `<div style="font-size:11px;color:#64748b;margin-top:2px;">🔍 Evidence: ${escapeHtml(p.evidence)}</div>` : ''}
+              ${p.policy_clause ? `<div style="font-size:11px;color:var(--flim--green);margin-top:4px;font-family:var(--font-mono);">📜 Clause: ${escapeHtml(p.policy_clause)}</div>` : ''}
+              ${p.evidence ? `<div style="font-size:11px;color:var(--theme--muted);margin-top:2px;font-family:var(--font-mono);">🔍 Evidence: ${escapeHtml(p.evidence)}</div>` : ''}
             </div>
           `;
         }).join('');
@@ -1234,13 +1489,13 @@
       if (!lastInteractionId) return;
       const btn = document.getElementById('btn-replay-interaction');
       btn.disabled = true;
-      btn.textContent = 'Replaying...';
+      btn.textContent = 'REPLAYING...';
 
       try {
         const resp = await fetch(`/interactions/${lastInteractionId}/replay`, { method: 'POST' });
         const res = await resp.json();
         btn.disabled = false;
-        btn.textContent = '↺ Replay Against Rules';
+        btn.textContent = '↺ REPLAY AGAINST RULES';
 
         alert(
           `↺ Deterministic Replay Result for ${res.interaction_id}:\n\n` +
@@ -1251,7 +1506,7 @@
         );
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = '↺ Replay Against Rules';
+        btn.textContent = '↺ REPLAY AGAINST RULES';
         alert('Replay request failed: ' + err.message);
       }
     }
