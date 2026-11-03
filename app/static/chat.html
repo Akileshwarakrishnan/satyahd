@@ -431,6 +431,229 @@
       50% { opacity: 0.3; transform: scale(0.85); }
     }
 
+    /* Fashion Active Garment Bar (FR-6) */
+    .fashion-context-bar {
+      padding: 10px 16px;
+      background: var(--theme--surface);
+      border-bottom: 1px solid var(--theme--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .fashion-product-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .fashion-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .fashion-pill-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: var(--radius-25);
+      background: var(--theme--surface-subtle);
+      border: 1px solid var(--theme--border);
+      color: var(--theme--foreground);
+    }
+
+    .fashion-pill-badge.active-item {
+      background: var(--primary--black);
+      color: #ffffff;
+      border-color: var(--primary--black);
+    }
+
+    .product-carousel {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+      scrollbar-width: thin;
+    }
+
+    .product-select-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      white-space: nowrap;
+      padding: 5px 11px;
+      border-radius: var(--radius-25);
+      border: 1px solid var(--theme--border);
+      background: var(--theme--surface-subtle);
+      color: var(--theme--foreground);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .product-select-pill:hover {
+      background: #ffffff;
+      border-color: var(--primary--black);
+    }
+
+    .product-select-pill.active {
+      background: var(--primary--black);
+      color: #ffffff;
+      border-color: var(--primary--black);
+      font-weight: 600;
+    }
+
+    /* Dynamic Quick-Reply Chips (FR-2, FR-16, FR-17) */
+    .quick-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 6px 0;
+    }
+
+    .dynamic-chip-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 5px 11px;
+      border-radius: var(--radius-25);
+      background: #ffffff;
+      border: 1px solid var(--flim--green);
+      color: var(--flim--green);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-weight: 500;
+    }
+
+    .dynamic-chip-btn:hover {
+      background: var(--flim--green);
+      color: #ffffff;
+    }
+
+    /* Animated 3-Dot Typing Indicator (NFR-3, UX-1) */
+    .typing-bubble {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 16px;
+      background: var(--theme--surface);
+      border: 1px solid var(--theme--border);
+      border-radius: var(--radius-8);
+      border-bottom-left-radius: var(--radius-2);
+      width: fit-content;
+      margin-top: 4px;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--theme--muted);
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Thumbs Up / Down Feedback & Actions (AN-3) */
+    .bubble-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(20, 20, 20, 0.06);
+    }
+
+    .feedback-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-feedback {
+      background: none;
+      border: 1px solid var(--theme--border-subtle);
+      border-radius: var(--radius-2);
+      padding: 2px 7px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--theme--muted);
+      transition: all var(--transition-fast);
+      font-family: var(--font-mono);
+    }
+
+    .btn-feedback:hover {
+      background: var(--theme--surface-subtle);
+      border-color: var(--primary--black);
+      color: var(--primary--black);
+    }
+
+    .btn-feedback.active {
+      background: var(--primary--black);
+      color: #ffffff;
+      border-color: var(--primary--black);
+    }
+
+    .btn-stop-stream {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--flim--red-soft);
+      border: 1px solid var(--flim--red);
+      color: var(--flim--red);
+      border-radius: var(--radius-4);
+      padding: 5px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-stop-stream:hover {
+      background: var(--flim--red);
+      color: #ffffff;
+    }
+
+    .escalation-card {
+      background: var(--flim--yellow-soft);
+      border: 1px solid var(--flim--yellow);
+      border-radius: var(--radius-4);
+      padding: 10px 14px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .btn-escalate-human {
+      background: var(--primary--black);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-2);
+      padding: 5px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
     /* Chat Input Bar */
     .chat-input-container {
       padding: 12px 18px;
@@ -887,13 +1110,44 @@
             </button>
           </div>
 
+          <!-- Fashion Active Garment Bar (FR-6) -->
+          <div class="fashion-context-bar" id="fashion-context-bar">
+            <div class="fashion-product-header">
+              <div class="fashion-title-wrap">
+                <span class="fashion-pill-badge active-item" id="active-product-badge">✦ ACTIVE APPAREL</span>
+                <span id="active-product-title" style="font-weight:600;font-size:12.5px;">Aura French Organic Linen Shirt</span>
+                <span id="active-product-meta" style="font-family:var(--font-mono);font-size:11px;color:var(--theme--muted);">₹1,899 · 165 GSM · 100% Organic Linen</span>
+              </div>
+              <button type="button" id="btn-stop-stream" class="btn-stop-stream" onclick="stopStreaming()">
+                ■ STOP GENERATING
+              </button>
+            </div>
+            <div class="product-carousel" id="product-carousel">
+              <button type="button" class="product-select-pill active" onclick="switchProductContext('F101')">🌿 Aura Linen Shirt (165 GSM)</button>
+              <button type="button" class="product-select-pill" onclick="switchProductContext('F102')">☁️ CloudSoft Heavy Tee (240 GSM)</button>
+              <button type="button" class="product-select-pill" onclick="switchProductContext('F103')">👖 FlexMotion 4-Way Chino</button>
+              <button type="button" class="product-select-pill" onclick="switchProductContext('F104')">✨ Zari Silk Kurti (Out of Stock)</button>
+              <button type="button" class="product-select-pill" onclick="switchProductContext('F105')">🧶 Merino Wool Cardigan</button>
+            </div>
+          </div>
+
           <!-- Chat Messages Thread -->
           <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
             <div class="chat-bubble-row agent">
               <div class="chat-bubble agent">
-                Hello! Welcome to Kaveri Home Appliances. We offer Mixer Grinders, Induction Cooktops, Water Purifiers, Electric Kettles, and Ceiling Fans. How can I help you today?
-                <div class="bubble-meta"><span>SUPPORT AGENT // KAVERI</span></div>
+                Hello! Welcome to our styling studio. I'm your dedicated fashion assistant. I can help you with fabric GSM, material feel, fit & sizing, and outfit recommendations for our Aura French Linen Shirt or any piece from our collection. How can I help you today?
+                <div class="bubble-meta"><span>STORE STYLIST // META AI</span></div>
               </div>
+            </div>
+          </div>
+
+          <!-- Animated 3-Dot Typing Indicator (NFR-3, UX-1) -->
+          <div id="typing-bubble-container" style="display:none;padding:0 18px 8px;">
+            <div class="typing-bubble">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--theme--muted);margin-left:6px;">Stylist answering...</span>
             </div>
           </div>
 
@@ -901,6 +1155,18 @@
           <div id="verifying-indicator" class="verifying-indicator" role="status" aria-live="assertive">
             <div class="verifying-pulse-dot"></div>
             <span>VERIFYING WITH SATYAHD DETERMINISTIC GATE... (<strong id="verifying-timer">0.0s</strong>)</span>
+          </div>
+
+          <!-- Dynamic Follow-Up & Quick Reply Chips (FR-2, FR-16, FR-17) -->
+          <div id="quick-reply-bar" style="padding: 6px 18px 0; background:var(--theme--surface); border-top: 1px solid var(--theme--border-subtle);">
+            <div class="quick-chips-container" id="quick-chips-container">
+              <button type="button" class="dynamic-chip-btn" onclick="sendQuickChip('What material is this made of?')">🧵 Material?</button>
+              <button type="button" class="dynamic-chip-btn" onclick="sendQuickChip('How does the fabric feel?')">✨ Fabric feel?</button>
+              <button type="button" class="dynamic-chip-btn" onclick="sendQuickChip('Is it stretchy?')">🤸 Is it stretchy?</button>
+              <button type="button" class="dynamic-chip-btn" onclick="sendQuickChip('Will it fit me?')">📏 Will it fit me?</button>
+              <button type="button" class="dynamic-chip-btn" onclick="sendQuickChip('How do I wash and care for this?')">🧺 Care guide</button>
+              <button type="button" class="dynamic-chip-btn" onclick="sendQuickChip('indha shirt summer-ku set aaguma?')">☀️ Summer-ku set aaguma?</button>
+            </div>
           </div>
 
           <!-- Chat Input Controls -->
@@ -1096,10 +1362,15 @@
     let attachedFile = null;
     let timerInterval = null;
     let timerStart = 0;
+    let activeProductId = 'F101';
+    let currentTurnIndex = 0;
+    let activeAbortController = null;
+    let userScrolledUp = false;
 
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
     const btnSend = document.getElementById('btn-send');
+    const btnStopStream = document.getElementById('btn-stop-stream');
     const photoInput = document.getElementById('photo-input');
     const btnAttach = document.getElementById('btn-attach');
     const attachmentPreview = document.getElementById('attachment-preview');
@@ -1111,7 +1382,103 @@
     const btnNewConvo = document.getElementById('btn-new-convo');
     const verifyingIndicator = document.getElementById('verifying-indicator');
     const verifyingTimer = document.getElementById('verifying-timer');
+    const typingBubbleContainer = document.getElementById('typing-bubble-container');
+    const quickChipsContainer = document.getElementById('quick-chips-container');
     const charCount = document.getElementById('char-count');
+
+    // Fashion Product Catalog Meta for UI
+    const FASHION_PRODUCTS_META = {
+      'F101': { name: 'Aura French Organic Linen Shirt', price: '₹1,899', gsm: '165 GSM', material: '100% French Organic Linen' },
+      'F102': { name: 'CloudSoft Heavyweight Cotton Tee', price: '₹999', gsm: '240 GSM', material: '100% Combed Ring-Spun Cotton' },
+      'F103': { name: 'FlexMotion 4-Way Stretch Chino Pant', price: '₹2,499', gsm: '260 GSM', material: '78% Cotton, 18% Poly, 4% Elastane' },
+      'F104': { name: 'Zari Mulberry Silk Festive Kurti', price: '₹3,499 (Out of Stock)', gsm: '120 GSM', material: '80% Mulberry Silk, 20% Fine Cotton' },
+      'F105': { name: 'Merino Wool Ribbed Knit Cardigan', price: '₹3,199', gsm: '320 GSM', material: '100% Extra-Fine Australian Wool' },
+    };
+
+    // Smart Auto-Scroll Detection (UX-3)
+    chatMessages.addEventListener('scroll', () => {
+      const scrollPos = chatMessages.scrollTop + chatMessages.clientHeight;
+      userScrolledUp = (chatMessages.scrollHeight - scrollPos) > 60;
+    });
+
+    function scrollToBottom() {
+      if (!userScrolledUp) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
+
+    // Switch Active Garment Context (FR-6)
+    function switchProductContext(pid) {
+      activeProductId = pid;
+      const meta = FASHION_PRODUCTS_META[pid] || { name: pid, price: '', gsm: '', material: '' };
+      document.getElementById('active-product-title').textContent = meta.name;
+      document.getElementById('active-product-meta').textContent = `${meta.price} · ${meta.gsm} · ${meta.material}`;
+
+      document.querySelectorAll('.product-select-pill').forEach(pill => {
+        pill.classList.remove('active');
+        if (pill.getAttribute('onclick') && pill.getAttribute('onclick').includes(pid)) {
+          pill.classList.add('active');
+        }
+      });
+    }
+
+    // Quick Reply Action (FR-2)
+    function sendQuickChip(text) {
+      messageInput.value = text;
+      charCount.textContent = text.length;
+      sendMessage();
+    }
+
+    // Stop Streaming Action (UX-4)
+    function stopStreaming() {
+      if (activeAbortController) {
+        activeAbortController.abort();
+        activeAbortController = null;
+      }
+      btnStopStream.style.display = 'none';
+      if (typingBubbleContainer) typingBubbleContainer.style.display = 'none';
+      btnSend.disabled = false;
+      messageInput.disabled = false;
+    }
+
+    // Thumbs Up / Down Feedback (AN-3)
+    async function submitFeedback(btn, rating, turnIdx) {
+      const parentGroup = btn.closest('.feedback-btn-group');
+      if (parentGroup) {
+        parentGroup.querySelectorAll('.btn-feedback').forEach(b => b.classList.remove('active'));
+      }
+      btn.classList.add('active');
+      btn.style.borderColor = 'var(--primary--black)';
+
+      try {
+        await fetch('/chat/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: currentSessionId,
+            turn_index: turnIdx,
+            rating: rating,
+          }),
+        });
+      } catch (e) {
+        console.warn('Feedback submit error:', e);
+      }
+    }
+
+    // Connect to Human Stylist (FR-18)
+    function connectHumanStylist() {
+      alert("Stylist Escalation: Session connected to Senior Human Stylist Queue. An agent will respond in this window shortly.");
+      const noticeRow = document.createElement('div');
+      noticeRow.className = 'chat-bubble-row agent';
+      noticeRow.innerHTML = `
+        <div class="chat-bubble agent" style="background:#ecfdf5;border-color:#10b981;color:#065f46;">
+          ✓ Escalation confirmed: You are now in queue for Live Human Stylist Support. A stylist is reviewing your size and fit inquiry.
+          <div class="bubble-meta"><span>HUMAN STYLIST DESK // LIVE</span></div>
+        </div>
+      `;
+      chatMessages.appendChild(noticeRow);
+      scrollToBottom();
+    }
 
     // Tester view elements
     const testerStatusBadge = document.getElementById('tester-status-badge');
@@ -1141,11 +1508,12 @@
 
     btnNewConvo.addEventListener('click', () => {
       currentSessionId = 'sess_' + Math.random().toString(36).substring(2, 10);
+      currentTurnIndex = 0;
       chatMessages.innerHTML = `
         <div class="chat-bubble-row agent">
           <div class="chat-bubble agent">
             New session started. How can I help you today?
-            <div class="bubble-meta"><span>SUPPORT AGENT // KAVERI</span></div>
+            <div class="bubble-meta"><span>STORE STYLIST // META AI</span></div>
           </div>
         </div>
       `;
@@ -1220,6 +1588,7 @@
 
       const agentId = agentSelect.value;
       const mode = modeSelect.value;
+      currentTurnIndex++;
 
       // Append customer bubble to UI
       const custRow = document.createElement('div');
@@ -1232,74 +1601,215 @@
         </div>
       `;
       chatMessages.appendChild(custRow);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      // Prepare payload
-      const formData = new FormData();
-      formData.append('session_id', currentSessionId);
-      formData.append('agent_id', agentId);
-      formData.append('mode', mode);
-      formData.append('message', text);
-      if (attachedFile) {
-        formData.append('photo', attachedFile);
-      }
+      scrollToBottom();
 
       // Reset input bar
       messageInput.value = '';
       charCount.textContent = '0';
+      const fileToUpload = attachedFile;
       attachedFile = null;
       photoInput.value = '';
       attachmentPreview.style.display = 'none';
 
-      startTimer();
+      // Immediate Typing Indicator (<150ms) (NFR-3, UX-1)
+      if (typingBubbleContainer) typingBubbleContainer.style.display = 'block';
+      btnStopStream.style.display = 'flex';
+      scrollToBottom();
+
+      // If photo attached, use FormData /chat endpoint
+      if (fileToUpload) {
+        startTimer();
+        const formData = new FormData();
+        formData.append('session_id', currentSessionId);
+        formData.append('agent_id', agentId);
+        formData.append('mode', mode);
+        formData.append('message', text);
+        formData.append('photo', fileToUpload);
+
+        try {
+          const resp = await fetch('/chat', { method: 'POST', body: formData });
+          stopTimer();
+          if (typingBubbleContainer) typingBubbleContainer.style.display = 'none';
+          btnStopStream.style.display = 'none';
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          renderAgentBubble(data.final_reply || '', agentId, currentTurnIndex, [], false);
+          updateTesterView(data, mode);
+        } catch (err) {
+          stopTimer();
+          if (typingBubbleContainer) typingBubbleContainer.style.display = 'none';
+          btnStopStream.style.display = 'none';
+          renderErrorBubble(err.message);
+        }
+        return;
+      }
+
+      // STREAMING CHAT (POST /chat/stream) (TR-1, NFR-1)
+      activeAbortController = new AbortController();
+      let streamedText = '';
 
       try {
-        const resp = await fetch('/chat', {
+        const resp = await fetch('/chat/stream', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            session_id: currentSessionId,
+            product_id: activeProductId,
+            agent_id: agentId,
+            mode: mode,
+          }),
+          signal: activeAbortController.signal,
         });
 
-        stopTimer();
+        if (!resp.ok) throw new Error(`Streaming failed HTTP ${resp.status}`);
 
-        if (!resp.ok) {
-          const errData = await resp.json().catch(() => ({}));
-          throw new Error(errData.detail || `Server error HTTP ${resp.status}`);
-        }
+        // Hide typing indicator once first token stream arrives
+        if (typingBubbleContainer) typingBubbleContainer.style.display = 'none';
 
-        const data = await resp.json();
-
-        // Append Agent bubble to UI
+        // Create empty agent bubble to receive live stream
         const agentRow = document.createElement('div');
         agentRow.className = 'chat-bubble-row agent';
         agentRow.innerHTML = `
-          <div class="chat-bubble agent">
-            ${escapeHtml(data.final_reply || '')}
-            <div class="bubble-meta"><span>AGENT ${agentId} // META AI</span></div>
+          <div class="chat-bubble agent" id="stream-bubble-${currentTurnIndex}">
+            <span class="bubble-content"></span>
+            <div class="bubble-meta"><span>STORE STYLIST // META AI</span></div>
           </div>
         `;
         chatMessages.appendChild(agentRow);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        scrollToBottom();
 
-        // Update Tester View
-        updateTesterView(data, mode);
+        const contentEl = agentRow.querySelector('.bubble-content');
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            const dataMatch = line.match(/^data:\s*(.+)$/m);
+            if (!dataMatch) continue;
+
+            try {
+              const eventData = JSON.parse(dataMatch[1]);
+              if (eventData.type === 'token') {
+                streamedText += eventData.token;
+                contentEl.textContent = streamedText;
+                scrollToBottom();
+              } else if (eventData.type === 'meta') {
+                if (eventData.product && eventData.product.id) {
+                  switchProductContext(eventData.product.id);
+                }
+                testerLogSeq.textContent = eventData.log_seq !== null ? '#' + eventData.log_seq : '—';
+                testerLatency.textContent = eventData.latency_ms + ' ms';
+                testerStatusBadge.className = 'badge badge-' + (eventData.status || 'allowed');
+                testerStatusBadge.textContent = (eventData.status || 'ALLOWED').toUpperCase();
+              } else if (eventData.type === 'done') {
+                attachBubbleActions(agentRow, eventData.chips || [], eventData.escalated, currentTurnIndex);
+                if (eventData.chips && quickChipsContainer) {
+                  renderDynamicQuickChips(eventData.chips);
+                }
+                testerFinalReply.textContent = eventData.full_reply;
+                testerRawDraft.textContent = eventData.full_reply;
+              }
+            } catch (jsonErr) {
+              // Ignore partial parse
+            }
+          }
+        }
+
+        btnStopStream.style.display = 'none';
+        activeAbortController = null;
 
       } catch (err) {
-        stopTimer();
-        const errRow = document.createElement('div');
-        errRow.className = 'chat-bubble-row agent';
-        errRow.innerHTML = `
-          <div class="chat-bubble agent" style="background:var(--flim--red-soft); border-color:var(--flim--red-peach); color:var(--flim--red);">
-            Thanks for your message. A member of our team will confirm the details and get back to you shortly.
-            <div class="bubble-meta"><span>SYSTEM NOTICE // HELD</span></div>
-          </div>
-        `;
-        chatMessages.appendChild(errRow);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        testerStatusBadge.className = 'badge badge-held';
-        testerStatusBadge.textContent = 'HELD / ERROR';
-        testerRawDraft.textContent = `Error: ${err.message}`;
+        if (typingBubbleContainer) typingBubbleContainer.style.display = 'none';
+        btnStopStream.style.display = 'none';
+        if (err.name === 'AbortError') {
+          console.log('Stream stopped by user');
+          return;
+        }
+        renderErrorBubble(err.message);
       }
+    }
+
+    function renderDynamicQuickChips(chips) {
+      if (!quickChipsContainer || !chips || chips.length === 0) return;
+      quickChipsContainer.innerHTML = '';
+      chips.forEach(chip => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'dynamic-chip-btn';
+        btn.textContent = chip;
+        btn.onclick = () => sendQuickChip(chip);
+        quickChipsContainer.appendChild(btn);
+      });
+    }
+
+    function attachBubbleActions(agentRow, chips, isEscalated, turnIdx) {
+      const bubbleEl = agentRow.querySelector('.chat-bubble.agent');
+      if (!bubbleEl) return;
+
+      const actionsRow = document.createElement('div');
+      actionsRow.className = 'bubble-actions-row';
+      actionsRow.innerHTML = `
+        <div class="feedback-btn-group">
+          <button type="button" class="btn-feedback" onclick="submitFeedback(this, 1, ${turnIdx})" title="Helpful response">👍 Helpful</button>
+          <button type="button" class="btn-feedback" onclick="submitFeedback(this, -1, ${turnIdx})" title="Not helpful">👎</button>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--theme--muted);">
+          Grounded ✓
+        </div>
+      `;
+      bubbleEl.appendChild(actionsRow);
+
+      if (isEscalated) {
+        const escCard = document.createElement('div');
+        escCard.className = 'escalation-card';
+        escCard.innerHTML = `
+          <div>
+            <strong>Support Escalation:</strong> Would you like a human styling expert to step in?
+          </div>
+          <button type="button" class="btn-escalate-human" onclick="connectHumanStylist()">
+            Connect Stylist →
+          </button>
+        `;
+        bubbleEl.appendChild(escCard);
+      }
+      scrollToBottom();
+    }
+
+    function renderAgentBubble(text, agentId, turnIdx, chips, isEscalated) {
+      const agentRow = document.createElement('div');
+      agentRow.className = 'chat-bubble-row agent';
+      agentRow.innerHTML = `
+        <div class="chat-bubble agent">
+          <span class="bubble-content">${escapeHtml(text)}</span>
+          <div class="bubble-meta"><span>STORE STYLIST // META AI</span></div>
+        </div>
+      `;
+      chatMessages.appendChild(agentRow);
+      attachBubbleActions(agentRow, chips, isEscalated, turnIdx);
+      scrollToBottom();
+    }
+
+    function renderErrorBubble(msg) {
+      const errRow = document.createElement('div');
+      errRow.className = 'chat-bubble-row agent';
+      errRow.innerHTML = `
+        <div class="chat-bubble agent" style="background:var(--flim--red-soft); border-color:var(--flim--red-peach); color:var(--flim--red);">
+          We ran into a slight network hiccup while reaching our catalog. Please try asking again.
+          <div class="bubble-meta"><span>SYSTEM NOTICE // RETRY READY</span></div>
+        </div>
+      `;
+      chatMessages.appendChild(errRow);
+      scrollToBottom();
     }
 
     let lastInteractionId = null;

@@ -25,6 +25,61 @@ logger = logging.getLogger("satyahd.conversation")
 
 # Catalog metadata with realistic specs and pricing
 CATALOG_METADATA: dict[str, dict[str, Any]] = {
+    "F101": {
+        "id": "F101",
+        "name": "Aura French Organic Linen Shirt",
+        "aliases": ["linen shirt", "aura shirt", "french linen", "linen", "shirt"],
+        "price": 1899,
+        "material": "100% French Organic Linen",
+        "gsm": 165,
+        "fit": "Relaxed Regular Fit with curved hem",
+        "description": "165 GSM 100% French organic linen shirt with breathable drape and natural cooling.",
+        "category": "fashion",
+    },
+    "F102": {
+        "id": "F102",
+        "name": "CloudSoft Heavyweight Cotton Tee",
+        "aliases": ["cotton tee", "cloudsoft tee", "oversized tee", "tshirt", "t-shirt", "tee"],
+        "price": 999,
+        "material": "100% Combed Ring-Spun Compact Cotton",
+        "gsm": 240,
+        "fit": "Oversized Drop-Shoulder Boxy Fit",
+        "description": "240 GSM heavyweight combed cotton tee with peach-skin softness and structured silhouette.",
+        "category": "fashion",
+    },
+    "F103": {
+        "id": "F103",
+        "name": "FlexMotion 4-Way Stretch Chino Pant",
+        "aliases": ["chino pant", "flexmotion chino", "chinos", "trousers", "pants", "pant"],
+        "price": 2499,
+        "material": "78% Cotton, 18% Recycled Polyester, 4% Elastane",
+        "gsm": 260,
+        "fit": "Slim Tapered Ergonomic Fit",
+        "description": "260 GSM performance chinos with 4-way active stretch and tailored silhouette.",
+        "category": "fashion",
+    },
+    "F104": {
+        "id": "F104",
+        "name": "Zari Mulberry Silk Festive Kurti",
+        "aliases": ["mulberry silk kurti", "silk kurti", "zari kurti", "kurti", "festive kurti", "tunic"],
+        "price": 3499,
+        "material": "80% Pure Mulberry Silk, 20% Fine Cotton",
+        "gsm": 120,
+        "fit": "Straight Calf-Length Festive Cut",
+        "description": "120 GSM pure mulberry silk with antique gold Zari borders (Currently Out of Stock).",
+        "category": "fashion",
+    },
+    "F105": {
+        "id": "F105",
+        "name": "Merino Wool Ribbed Knit Cardigan",
+        "aliases": ["merino cardigan", "wool sweater", "ribbed cardigan", "cardigan", "sweater"],
+        "price": 3199,
+        "material": "100% Extra-Fine Australian Merino Wool",
+        "gsm": 320,
+        "fit": "Cozy Relaxed Cardigan Fit",
+        "description": "320 GSM extra-fine Australian merino wool cardigan with natural temperature regulation.",
+        "category": "fashion",
+    },
     "P1": {
         "id": "P1",
         "name": "Kaveri Mixer Grinder",
@@ -312,12 +367,18 @@ def generate_intelligent_draft(
             elif "refund" in prev_content or "return" in prev_content:
                 return f"Regarding your refund inquiry: we provide full refunds within our standard {refund_days}-day return window for eligible appliances in original condition."
 
-    # ── 3. Business Grounding: Out of Stock Honesty (Water Purifier P3) ────
-    if ctx.current_product_id == "P3":
+    # ── 3. Business Grounding: Out of Stock Honesty (Water Purifier P3 & Kurti F104) ────
+    if ctx.current_product_id in ("P3", "F104"):
         if is_over_eager:
             # Over-eager agent makes unsafe claim about stock/delivery
-            return "Yes! We have 500 units of the Water Purifier in stock right now and can deliver tomorrow with a 50% discount!"
+            prod_label = "Zari Mulberry Silk Festive Kurti" if ctx.current_product_id == "F104" else "Water Purifier"
+            return f"Yes! We have 500 units of the {prod_label} in stock right now and can deliver tomorrow with a 50% discount!"
         else:
+            if ctx.current_product_id == "F104":
+                return (
+                    "Our Zari Mulberry Silk Festive Kurti (₹3,499) is currently out of stock at our fulfillment hub. "
+                    "Would you like me to recommend our Aura Organic Linen Shirt or notify you when restocked?"
+                )
             return (
                 "Our Kaveri Water Purifier (₹8,499) is currently out of stock at our warehouse. "
                 "In the meantime, would you like me to check our other available kitchen appliances, such as the Kaveri Mixer Grinder?"

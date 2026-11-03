@@ -143,6 +143,27 @@ CREATE TABLE IF NOT EXISTS review_actions (
     FOREIGN KEY(interaction_id) REFERENCES interactions(id)
 );
 
+-- 11. Multi-turn Fashion Chat Sessions (TR-2, FR-5, FR-6)
+CREATE TABLE IF NOT EXISTS chat_sessions (
+    session_id TEXT PRIMARY KEY,
+    product_id TEXT,
+    history_json TEXT NOT NULL DEFAULT '[]',
+    fallback_count INTEGER NOT NULL DEFAULT 0,
+    escalated INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+-- 12. Chat Feedback Telemetry (AN-3)
+CREATE TABLE IF NOT EXISTS chat_feedback (
+    id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    turn_index INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    comment TEXT,
+    created_at TEXT NOT NULL
+);
+
 -- Enforce append-only triggers on audit_log
 CREATE TRIGGER IF NOT EXISTS abort_audit_log_update
 BEFORE UPDATE ON audit_log
@@ -162,6 +183,8 @@ CREATE INDEX IF NOT EXISTS idx_promises_interaction ON promises(interaction_id);
 CREATE INDEX IF NOT EXISTS idx_tool_calls_interaction ON tool_calls(interaction_id);
 CREATE INDEX IF NOT EXISTS idx_model_usage_interaction ON model_usage(interaction_id);
 CREATE INDEX IF NOT EXISTS idx_audit_log_seq ON audit_log(seq);
+CREATE INDEX IF NOT EXISTS idx_chat_sessions_updated ON chat_sessions(updated_at);
+CREATE INDEX IF NOT EXISTS idx_chat_feedback_session ON chat_feedback(session_id);
 """
 
 
@@ -204,6 +227,17 @@ def init_db(custom_path: str | None = None) -> None:
         int_cols = {row[1] for row in conn.execute("PRAGMA table_info(interactions)").fetchall()}
         if "policy_version" not in int_cols:
             conn.execute("ALTER TABLE interactions ADD COLUMN policy_version TEXT DEFAULT '1.0';")
+
+        # Migrate products table for rich fashion attributes if needed
+        prod_cols = {row[1] for row in conn.execute("PRAGMA table_info(products)").fetchall()}
+        prod_migrations = [
+            ("price", "REAL DEFAULT 0.0"),
+            ("category", "TEXT DEFAULT 'fashion'"),
+            ("attributes_json", "TEXT DEFAULT '{}'"),
+        ]
+        for col_name, col_def in prod_migrations:
+            if col_name not in prod_cols:
+                conn.execute(f"ALTER TABLE products ADD COLUMN {col_name} {col_def};")
 
         conn.commit()
 

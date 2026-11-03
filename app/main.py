@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
@@ -41,7 +42,7 @@ from typing import Any, AsyncGenerator
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
@@ -51,6 +52,11 @@ from app.config import BASE_DIR, get_settings
 from app.db import get_db, init_db
 from app.dispute import generate_dispute_report
 from app.extract import extract_promises, run_self_check_pass
+from app.fashion_agent import (
+    load_fashion_catalog,
+    process_fashion_turn,
+    stream_fashion_tokens,
+)
 from app.gateway import authorize_action
 from app.lifecycle import check_commitments_fulfillment, get_commitments_summary, update_promise_lifecycle
 from app.models import call_model
@@ -58,6 +64,7 @@ from app.receipt import generate_receipt_card
 from app.replay import replay_interaction, replay_recent_interactions
 from app.rules import BusinessRules, load_rules, save_rules
 from app.rewrite import HOLDING_REPLY, rewrite_and_reverify
+from app.session import record_feedback
 from app.verify import Verdict, collect_facts, verify, Promise
 
 # Structured logging (observability rule: no customer text at INFO level)
@@ -82,18 +89,35 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         load_rules()
         with get_db() as conn:
-            # Seed products if empty
-            products_count = conn.execute("SELECT COUNT(*) as c FROM products").fetchone()["c"]
-            if products_count == 0:
-                p_file = BASE_DIR / "data" / "products.json"
-                if p_file.exists():
-                    products = json.loads(p_file.read_text(encoding="utf-8"))
-                    for p in products:
-                        conn.execute(
-                            "INSERT INTO products (id, name, stock, shipping_days) VALUES (?, ?, ?, ?)",
-                            (p["id"], p["name"], p["stock"], p["shipping_days"]),
-                        )
-                    logger.info("Seeded %d products into SQLite", len(products))
+            # Sync products from products.json (supports upsert for new fashion catalog items)
+            p_file = BASE_DIR / "data" / "products.json"
+            if p_file.exists():
+                products = json.loads(p_file.read_text(encoding="utf-8"))
+                for p in products:
+                    attrs = {k: v for k, v in p.items() if k not in ("id", "name", "stock", "shipping_days", "price", "category")}
+                    conn.execute(
+                        """
+                        INSERT INTO products (id, name, stock, shipping_days, price, category, attributes_json)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        ON CONFLICT(id) DO UPDATE SET
+                            name = excluded.name,
+                            stock = excluded.stock,
+                            shipping_days = excluded.shipping_days,
+                            price = excluded.price,
+                            category = excluded.category,
+                            attributes_json = excluded.attributes_json
+                        """,
+                        (
+                            p["id"],
+                            p["name"],
+                            p["stock"],
+                            p["shipping_days"],
+                            float(p.get("price", 0.0)),
+                            p.get("category", "fashion"),
+                            json.dumps(attrs),
+                        ),
+                    )
+                logger.info("Synced %d products into SQLite (including fashion catalog)", len(products))
 
             # Seed orders if empty
             orders_count = conn.execute("SELECT COUNT(*) as c FROM orders").fetchone()["c"]
@@ -550,6 +574,150 @@ async def chat_endpoint(
         "plan": verification_res.plan,
         "evidence_bundle": verification_res.evidence_bundle,
     }
+
+
+# ── Responsive Fashion Chat Streaming & Feedback Endpoints (TR-1, NFR-1, AN-3) ─
+
+class StreamChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, description="Customer free-text inquiry")
+    session_id: str | None = Field(default=None, description="Client session ID")
+    product_id: str | None = Field(default=None, description="Active garment or product ID")
+    agent_id: str | None = Field(default="A", description="Agent ID")
+    mode: str | None = Field(default="careful", description="Mode")
+
+
+class ChatFeedbackRequest(BaseModel):
+    session_id: str = Field(..., description="Session ID")
+    turn_index: int = Field(default=0, description="Turn index in conversation")
+    rating: int = Field(..., description="Rating: 1 for thumbs up, -1 for thumbs down")
+    comment: str | None = Field(default=None, description="Optional customer feedback comment")
+
+
+@app.get("/products/catalog")
+def get_products_catalog():
+    """Returns all catalog products including rich fashion attributes (FR-9, FR-11)."""
+    catalog = load_fashion_catalog()
+    return {"products": list(catalog.values())}
+
+
+@app.post("/chat/feedback")
+def submit_chat_feedback(payload: ChatFeedbackRequest):
+    """Submits thumbs up / down feedback on assistant turns (AN-3)."""
+    record_feedback(
+        session_id=payload.session_id,
+        turn_index=payload.turn_index,
+        rating=payload.rating,
+        comment=payload.comment,
+    )
+    return {"ok": True, "message": "Feedback recorded successfully."}
+
+
+@app.post("/chat/stream")
+async def chat_stream_endpoint(payload: StreamChatRequest) -> StreamingResponse:
+    """Server-Sent Events (SSE) streaming endpoint for responsive, human-like sales chat (TR-1, NFR-1).
+    
+    Streams token-by-token with TTFT < 800ms and verifies commercial claims against Satyahd business rules.
+    """
+    t0 = time.perf_counter()
+    session_id = payload.session_id or f"sess_{uuid.uuid4().hex[:12]}"
+    interaction_id = f"int_{uuid.uuid4().hex[:12]}"
+
+    # Process fashion turn in parallel (NFR-4)
+    reply_text, chips, product, is_grounded, confidence, is_escalated = await process_fashion_turn(
+        session_id=session_id,
+        message=payload.message,
+        product_id=payload.product_id,
+    )
+
+    # Trust Layer verification
+    extracted_promises, _ = extract_promises(
+        draft=reply_text,
+        customer_message=payload.message,
+        interaction_id=interaction_id,
+    )
+    rules = load_rules()
+    facts = collect_facts(promises=extracted_promises, image_evidence={}, interaction_id=interaction_id)
+    verif = verify(extracted_promises, rules, facts)
+
+    final_reply = reply_text
+    status = "allowed"
+    if verif.message_verdict == Verdict.BLOCK:
+        rewritten, _, re_st = rewrite_and_reverify(
+            original_draft=reply_text,
+            violations=verif.violations,
+            rules=rules,
+            facts=facts,
+            customer_message=payload.message,
+            interaction_id=interaction_id,
+        )
+        final_reply = rewritten
+        status = re_st
+
+    # Cryptographic append-only audit entry
+    audit_payload = {
+        "interaction_id": interaction_id,
+        "session_id": session_id,
+        "customer_message": payload.message,
+        "final_reply": final_reply,
+        "product_id": product.get("id"),
+        "status": status,
+        "is_grounded": is_grounded,
+        "confidence": confidence,
+    }
+    log_seq: int | None = None
+    try:
+        log_seq = append_audit_entry("decision", audit_payload, interaction_id=interaction_id)
+    except Exception as exc:
+        logger.warning("Audit log write notice: %s", exc)
+
+    latency_ms = int((time.perf_counter() - t0) * 1000)
+
+    async def sse_generator() -> AsyncGenerator[str, None]:
+        # 1. Meta event
+        meta_data = {
+            "type": "meta",
+            "interaction_id": interaction_id,
+            "session_id": session_id,
+            "product": {
+                "id": product.get("id"),
+                "name": product.get("name"),
+                "price": product.get("price"),
+                "gsm": product.get("gsm"),
+                "material": product.get("material"),
+                "stock": product.get("stock"),
+            },
+            "status": status,
+            "latency_ms": latency_ms,
+            "log_seq": log_seq,
+        }
+        yield f"event: meta\ndata: {json.dumps(meta_data)}\n\n"
+
+        # 2. Token events with natural reading cadence (NFR-1, UX-2)
+        async for token in stream_fashion_tokens(final_reply):
+            token_data = {"type": "token", "token": token}
+            yield f"event: token\ndata: {json.dumps(token_data)}\n\n"
+
+        # 3. Done event with dynamic follow-up chips (FR-16, FR-17)
+        done_data = {
+            "type": "done",
+            "full_reply": final_reply,
+            "chips": chips,
+            "grounded": is_grounded,
+            "confidence": confidence,
+            "escalated": is_escalated,
+            "interaction_id": interaction_id,
+        }
+        yield f"event: done\ndata: {json.dumps(done_data)}\n\n"
+
+    return StreamingResponse(
+        sse_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ── Universal Middleman Plugin API (Section 3: R-101 to R-106) ─────────────
