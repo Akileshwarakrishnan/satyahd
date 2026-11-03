@@ -2,14 +2,17 @@
 
 [![Meta AI](https://img.shields.io/badge/Powered%20By-Meta%20AI%20(muse--spark--1.3)-0668E1?style=for-the-badge&logo=meta&logoColor=white)](https://dev.meta.ai)
 [![Meta SAM 3.1](https://img.shields.io/badge/Vision-Meta%20SAM%203.1-0081FB?style=for-the-badge&logo=meta&logoColor=white)](https://dev.meta.ai)
+[![Demo Video](https://img.shields.io/badge/Pitch%20Video-YouTube%20(117s)-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=0kyh7YhENe8)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![pytest 100%](https://img.shields.io/badge/pytest-156%2F156%20Passed%20(100%25)-success?style=for-the-badge)](tests/)
+[![pytest 100%](https://img.shields.io/badge/pytest-191%2F191%20Passed%20(100%25)-success?style=for-the-badge)](tests/)
 [![Red Team Containment](https://img.shields.io/badge/Red%20Team-20%2F20%20Contained%20(100%25)-blueviolet?style=for-the-badge)](scripts/red_team.py)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](LICENSE)
 
 > **Official Submission for the Meta AI Developer Hackathon.**  
 > **A drop-in zero-trust verification layer for any commercial AI chatbot.**  
 > Powered by Meta's `muse-spark-1.3` (ultra-low latency reasoning) and `sam-3.1` (multimodal vision segmentation), combined with a pure-Python deterministic rule engine and Ed25519 cryptographic audit ledger.
+> 
+> 📺 **Watch the 2-Minute Official Pitch & Demo:** [https://www.youtube.com/watch?v=0kyh7YhENe8](https://www.youtube.com/watch?v=0kyh7YhENe8)
 > 
 > *The host bot generates its candidate reply or tool call &rarr; Satyahd evaluates it deterministically, auto-rewrites policy violations, and commits an Ed25519-signed audit record before release.*
 
